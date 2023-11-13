@@ -1,3 +1,5 @@
+{% load static %}
+{% load socialaccount %}
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -20,7 +22,7 @@
         letter-spacing: normal;
         line-height: 1.15;
         color: var(--dl-color-gray-black);
-        background-color: var(--dl-color-gray-white);
+        background-color: #5128f5;
 
       }
     </style>
@@ -33,7 +35,7 @@
        body::-webkit-scrollbar {
          width: 0.5em;
          z-index: 100;
-         background-color:transparent;
+         background-color:#5128f5;
        }
 
 
@@ -44,89 +46,11 @@
     </style>
   </head>
   <body>
-    <link rel="stylesheet" href="static/css/login/style.css" />
+    <link rel="stylesheet" href="{% static 'css/home/style.css' %}" />
     <div>
-      <link href="static/css/login/index.css" rel="stylesheet" />
+      <link href="{% static 'css/home/index.css' %}" rel="stylesheet" />
 
       <div class="home-container">
-        <section class="home-hero">
-          <div class="home-menu">
-            <div id="mobile-menu" class="home-mobile-navigation">
-              <img
-                alt="pastedImage"
-                src="public/pastedimage-no9b-1500h.png"
-                class="home-logo"
-              />
-              <div class="home-links">
-                <span class="Link">Solutions</span>
-                <span class="Link">How it works</span>
-                <span class="Link">Prices</span>
-              </div>
-              <div id="close-mobile-menu" class="home-close-mobile-menu">
-                <svg viewBox="0 0 804.5714285714286 1024" class="home-icon">
-                  <path
-                    d="M741.714 755.429c0 14.286-5.714 28.571-16 38.857l-77.714 77.714c-10.286 10.286-24.571 16-38.857 16s-28.571-5.714-38.857-16l-168-168-168 168c-10.286 10.286-24.571 16-38.857 16s-28.571-5.714-38.857-16l-77.714-77.714c-10.286-10.286-16-24.571-16-38.857s5.714-28.571 16-38.857l168-168-168-168c-10.286-10.286-16-24.571-16-38.857s5.714-28.571 16-38.857l77.714-77.714c10.286-10.286 24.571-16 38.857-16s28.571 5.714 38.857 16l168 168 168-168c10.286-10.286 24.571-16 38.857-16s28.571 5.714 38.857 16l77.714 77.714c10.286 10.286 16 24.571 16 38.857s-5.714 28.571-16 38.857l-168 168 168 168c10.286 10.286 16 24.571 16 38.857z"
-                  ></path>
-                </svg>
-              </div>
-            </div>
-            <div class="home-desktop-navigation">
-              <nav class="home-centered">
-                <div class="home-left">
-                  <div class="home-links1">
-                    <span class="Link">About</span>
-                    <span class="Link">Contact</span>
-                  </div>
-                </div>
-                <div class="home-right">
-                  <div class="home-get-started">
-                    <span class="home-text05">Sign in</span>
-                  </div>
-                  <div id="open-mobile-menu" class="home-burger-menu">
-                    <img
-                      alt="pastedImage"
-                      src="public/pastedimage-yxbd.svg"
-                      class="home-mobile-menu-button"
-                    />
-                  </div>
-                </div>
-              </nav>
-            </div>
-            <div>
-              <div class="home-container2">
-                <script>
-                  /*
-                  Mobile menu - Code Embed
-                  */
-
-                  // Mobile menu
-                  const mobileMenu = document.querySelector('#mobile-menu')
-
-                  // Buttons
-                  const closeButton = document.querySelector('#close-mobile-menu')
-                  const openButton = document.querySelector('#open-mobile-menu')
-
-                  // On openButton click, set the mobileMenu position left to -100vw
-                  openButton.addEventListener('click', function() {
-                      mobileMenu.style.transform = 'translateX(0%)'
-                  })
-
-                  // On closeButton click, set the mobileMenu position to 0vw
-                  closeButton.addEventListener('click', function() {
-                      mobileMenu.style.transform = 'translateX(100%)'
-                  })
-                </script>
-              </div>
-            </div>
-          </div>
-          <header class="home-header">
-            <h1 class="home-text06">Study Swift</h1>
-            <p class="home-text07">Swift Success Starts with Study Swift!</p>
-            <div class="home-get-started1">
-              <span class="home-text08">Login Portal</span>
-            </div>
-          </header>
-        </section>
         <section class="home-banners"></section>
         <section class="home-pricing">
           <div class="home-centered-container">
@@ -140,10 +64,20 @@
               <div class="home-card">
                 <span class="home-text11">Student</span>
                 <div class="home-get-started2 template-button">
-                  <span class="home-text12">Sign Up</span>
+                  <a href="{% url 'account_signup' %}">
+                    Sign Up
+                  </a>
                 </div>
                 <div class="home-get-started3 template-button">
-                  <span class="home-text13">Sign In</span>
+                  {% if request.user.is_authenticated %}
+                  <a href="{% url 'account_logout' %}">
+                    Sign In
+                  </a>
+                  {% else %}
+                  <a href="{% provider_login_url 'github' %}">
+                    Sign In
+                  </a>
+                  {% endif %}
                 </div>
                 <span class="home-text14">What's included</span>
                 <div class="home-bullet-points">
@@ -174,16 +108,20 @@
               <div class="home-card1">
                 <span class="home-text17">Teacher</span>
                 <div class="home-get-started4 template-button">
-                  <span class="home-text18">
-                    <span>Sign Up</span>
-                    <br />
-                  </span>
+                    <a href="{% url 'account_signup' %}">
+                        Sign Up
+                    </a>
                 </div>
                 <div class="home-get-started5 template-button">
-                  <span class="home-text21">
-                    <span>Sign In</span>
-                    <br />
-                  </span>
+                    {% if request.user.is_authenticated %}
+                    <a href="{% url 'account_logout' %}">
+                      Sign In
+                    </a>
+                    {% else %}
+                    <a href="{% provider_login_url 'github' %}">
+                      Sign In
+                    </a>
+                    {% endif %}
                 </div>
                 <span class="home-text24">What's included</span>
                 <div class="home-bullet-points1">
@@ -236,10 +174,15 @@
               <div class="home-card2">
                 <span class="home-text29">Admin</span>
                 <div class="home-get-started6 template-button">
-                  <span class="home-text30">
-                    <span>Sign In</span>
-                    <br />
-                  </span>
+                    {% if request.user.is_authenticated %}
+                    <a href="{% url 'menu' %}">
+                      Sign In
+                    </a>
+                    {% else %}
+                    <a href="{% provider_login_url 'github' %}">
+                      Sign In
+                    </a>
+                    {% endif %}
                 </div>
                 <span class="home-text33">What's included</span>
                 <div class="home-bullet-points2">
