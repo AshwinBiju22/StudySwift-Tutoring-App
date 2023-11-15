@@ -64,9 +64,15 @@
               <div class="home-card">
                 <span class="home-text11">Student</span>
                 <div class="home-get-started2 template-button">
+                  {% if request.user.is_authenticated %}
+                  <a href="{% url 'menu' %}">
+                    Sign Up
+                  </a>
+                  {% else %}
                   <a href="{% url 'account_signup' %}">
                     Sign Up
                   </a>
+                  {% endif %}
                 </div>
                 <div class="home-get-started3 template-button">
                   {% if request.user.is_authenticated %}

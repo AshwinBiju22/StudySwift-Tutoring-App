@@ -5,15 +5,9 @@ from django.utils import timezone
 def index(request):
     return render(request, "home/index.html")
 
-def signup(request):
-    return render(request, "login/signup.html")
-
-def signin(request):
-    return render(request, "login/signin.html")
-
 def portal(request):
     return render(request, "login/portal.html")
 
-def menu(request):
-    return render(request, "application/menu.html")
+def dashboard(request):
+    return render(request, "application/dashbaord.html")
 

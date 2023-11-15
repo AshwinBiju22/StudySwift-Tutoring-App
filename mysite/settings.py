@@ -65,7 +65,10 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'mysite.urls'
 
-LOGIN_REDIRECT_URL = "/"
+LOGIN_REDIRECT_URL = "/menu"
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+ACCOUNT_EMAIL_REQUIRED = True
+ACCOUNT_EMAIL_VERIFICATION = "mandatory"
 
 TEMPLATES = [
     {
