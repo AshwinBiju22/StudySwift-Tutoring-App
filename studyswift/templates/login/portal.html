@@ -65,7 +65,7 @@
                 <span class="home-text11">Student</span>
                 <div class="home-get-started2 template-button">
                   {% if request.user.is_authenticated %}
-                  <a href="{% url 'menu' %}">
+                  <a href="{% url 'dashboard' %}">
                     Sign Up
                   </a>
                   {% else %}
@@ -114,9 +114,15 @@
               <div class="home-card1">
                 <span class="home-text17">Teacher</span>
                 <div class="home-get-started4 template-button">
-                    <a href="{% url 'account_signup' %}">
-                        Sign Up
-                    </a>
+                    {% if request.user.is_authenticated %}
+                  <a href="{% url 'dashboard' %}">
+                    Sign Up
+                  </a>
+                  {% else %}
+                  <a href="{% url 'account_signup' %}">
+                    Sign Up
+                  </a>
+                  {% endif %}
                 </div>
                 <div class="home-get-started5 template-button">
                     {% if request.user.is_authenticated %}
@@ -181,7 +187,7 @@
                 <span class="home-text29">Admin</span>
                 <div class="home-get-started6 template-button">
                     {% if request.user.is_authenticated %}
-                    <a href="{% url 'menu' %}">
+                    <a href="{% url 'dashboard' %}">
                       Sign In
                     </a>
                     {% else %}

@@ -1,6 +1,9 @@
 {% extends "account/base_manage.html" %}
 {% load allauth i18n %}
+{% load static %}
 
+<body>
+    <link rel="stylesheet" href="{% static 'css/login/sign-in.css' %}" />
     <p>{% trans 'Are you sure you want to sign out?' %}</p>
     {% url 'account_logout' as action_url %}
     {% element form method="post" action=action_url no_visible_fields=True %}
@@ -18,4 +21,6 @@
             {% endelement %}
         {% endslot %}
     {% endelement %}
+</body>
+
 

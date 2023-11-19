@@ -9,5 +9,4 @@ def portal(request):
     return render(request, "login/portal.html")
 
 def dashboard(request):
-    return render(request, "application/dashbaord.html")
-
+    return render(request, "application/dashboard.html")
