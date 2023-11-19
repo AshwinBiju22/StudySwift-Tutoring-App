@@ -1,5 +1,7 @@
 {% load static %}
-{% load allauth i18n socialaccount %}
+{% load i18n %}
+{% load account %}
+{% load allauth %}
 
 <!DOCTYPE html>
 <html lang="en">
@@ -7,7 +9,7 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Confirm Email Address</title>
+    <title>Change Password</title>
 
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
@@ -33,30 +35,13 @@
             margin-bottom: 20px;
         }
 
-        p {
-            margin-bottom: 20px;
-        }
-
-        .menu {
-            margin-bottom: 30px;
-        }
-
-        .menu strong {
-            color: #61dafb;
-        }
-
-        .menu a {
-            color: #61dafb;
-            margin-right: 15px;
-            text-decoration: none;
-        }
-
-        .menu a:hover {
-            text-decoration: underline;
-        }
-
         form {
-            margin-top: 20px;
+            max-width: 400px;
+            margin: 0 auto;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
         }
 
         button[type="submit"] {
@@ -69,6 +54,24 @@
         button[type="submit"]:hover {
             background-color: #4285f4;
         }
+
+        .menu {
+            margin-bottom: 30px;
+        }
+
+        .menu a {
+            color: #61dafb;
+            margin-right: 15px;
+            text-decoration: none;
+        }
+
+        .menu a:hover {
+            text-decoration: underline;
+        }
+
+        p {
+            margin-bottom: 15px;
+        }
     </style>
 </head>
 <body>
@@ -79,13 +82,20 @@
             <a href="/accounts/signup/">Sign Up</a>
         </div>
 
-        <h1>Confirm Email Address</h1>
+        <h1>Change Password</h1>
 
-        <p>Please confirm that <a href="mailto:shayan@gmail.com">shayan@gmail.com</a> is an email address for user shayan.</p>
+        <form method="post" action="/accounts/password/reset/key/5-set-password/">
+            <input type="hidden" name="csrfmiddlewaretoken" value="Fv8zyX6MsNBAHkpRxwTmqotMQZrgaHp2hLoZsIDingn4D5aEQnKcQrmC0WMafizz">
+            <div class="form-group">
+                <label for="id_password1">New Password:</label>
+                <input type="password" name="password1" class="form-control" placeholder="New Password" autocomplete="new-password" required id="id_password1">
+            </div>
+            <div class="form-group">
+                <label for="id_password2">New Password (again):</label>
+                <input type="password" name="password2" class="form-control" placeholder="New Password (again)" required id="id_password2">
+            </div>
 
-        <form method="post" action="/accounts/confirm-email/Ng:1r4mMP:4uCeq-8Q9Ll1k59w2MdV_71xTsHCLhW_ZqfKaaeHAME/">
-            {% csrf_token %}
-            <button type="submit">Confirm</button>
+            <button name="action" type="submit" class="btn btn-primary">Change Password</button>
         </form>
     </div>
 
