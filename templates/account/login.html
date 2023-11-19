@@ -1,0 +1,167 @@
+{% load static %}
+{% load allauth account socialaccount %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign In</title>
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+
+    <style>
+        body {
+            background-color: #20232a;
+            color: #ffffff;
+            font-family: 'Arial', sans-serif;
+            margin: 20px;
+        }
+
+        .container {
+            background-color: #2c3038;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+            padding: 40px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        h1, h2 {
+            color: #61dafb;
+        }
+
+        ul.nav {
+            margin-bottom: 30px;
+        }
+
+        ul.nav li {
+            display: inline-block;
+            margin-right: 15px;
+        }
+
+        form {
+            max-width: 400px;
+            margin: 0 auto;
+        }
+
+        button[type="submit"] {
+            background-color: #61dafb;
+            border: none;
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        button[type="submit"]:hover {
+            background-color: #4285f4;
+        }
+
+        hr {
+            border-top: 1px solid #6c757d;
+            margin-top: 40px;
+            margin-bottom: 40px;
+        }
+
+        ul.list-unstyled {
+            padding-left: 0;
+            list-style: none;
+        }
+
+        ul.list-unstyled li {
+            margin-bottom: 10px;
+        }
+
+        a {
+            color: #61dafb;
+        }
+
+        a:hover {
+            text-decoration: none;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-control {
+            background-color: #343a40;
+            color: #ffffff;
+            border: 1px solid #61dafb;
+        }
+
+        .form-control:focus {
+            background-color: #454d55;
+            color: #ffffff;
+            border: 1px solid #61dafb;
+        }
+
+        .btn-primary {
+            background-color: #61dafb;
+            border: none;
+        }
+
+        .btn-primary:hover {
+            background-color: #4285f4;
+            border: none;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6 offset-md-3">
+                <ul class="nav">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/accounts/login/">Sign In</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/accounts/signup/">Sign Up</a>
+                    </li>
+                </ul>
+
+                <h1>Sign In</h1>
+
+                <p>If you have not created an account yet, then please <a href="/accounts/signup/">sign up</a> first.</p>
+
+                <form method="post" action="/accounts/login/">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <input type="text" name="login" class="form-control" placeholder="Username" autocomplete="username" maxlength="150" required>
+                    </div>
+                    <div class="form-group">
+                        <input type="password" name="password" class="form-control" placeholder="Password" autocomplete="current-password" required>
+                    </div>
+                    <span class="helptext"><a href="/accounts/password/reset/">Forgot your password?</a></span>
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-primary">Sign In</button>
+                    </div>
+                </form>
+
+                <hr>
+
+                <h2>Or use a third-party</h2>
+                <ul class="list-unstyled">
+                    <li>
+                        <a title="GitHub" href="/accounts/github/login/?process=login">GitHub</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS and Popper.js -->
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-U7Uo6Csm/PQqBxysX1SDPu5znQ41Zj3IuZDz8VISVZ4eq86XFKFDK4BvPQy1g8Ifj" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+
+</body>
+</html>
+
+
+
+
+
+

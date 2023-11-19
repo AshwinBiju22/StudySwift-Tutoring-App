@@ -66,7 +66,7 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'mysite.urls'
 
-LOGIN_REDIRECT_URL = "/menu"
+LOGIN_REDIRECT_URL = "/dashboard"
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_EMAIL_VERIFICATION = "mandatory"
@@ -74,7 +74,7 @@ ACCOUNT_EMAIL_VERIFICATION = "mandatory"
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR, "templates")],
+        'DIRS': [BASE_DIR / "templates"],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
