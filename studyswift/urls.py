@@ -7,6 +7,6 @@ urlpatterns = [
     path('accounts/', include('allauth.urls')),
 
     path("dashboard/", views.dashboard, name='dashboard'),
-    path('timetable/', views.timetable, name='timetable'),
     
 ]
+

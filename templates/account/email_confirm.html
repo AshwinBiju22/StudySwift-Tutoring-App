@@ -1,19 +1,8 @@
-{% load static %}
 {% load i18n %}
 {% load account %}
 {% load allauth %}
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Change Password</title>
-
-    <!-- Bootstrap CSS -->
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
-
+{% block content %}
     <style>
         body {
             background-color: #20232a;
@@ -30,18 +19,28 @@
             text-align: center;
         }
 
-        h1 {
+        h1, h2 {
             color: #61dafb;
-            margin-bottom: 20px;
+        }
+
+        .navbar {
+            margin-bottom: 30px;
+        }
+
+        .navbar-item {
+            display: inline-block;
+            margin-right: 15px;
+            color: #61dafb;
+            text-decoration: none;
+        }
+
+        .navbar-item:hover {
+            text-decoration: underline;
         }
 
         form {
             max-width: 400px;
             margin: 0 auto;
-        }
-
-        .form-group {
-            margin-bottom: 15px;
         }
 
         button[type="submit"] {
@@ -55,54 +54,86 @@
             background-color: #4285f4;
         }
 
-        .menu {
-            margin-bottom: 30px;
+        hr {
+            border-top: 1px solid #6c757d;
+            margin-top: 40px;
+            margin-bottom: 40px;
         }
 
-        .menu a {
+        ul.list-unstyled {
+            padding-left: 0;
+            list-style: none;
+        }
+
+        ul.list-unstyled li {
+            margin-bottom: 10px;
+        }
+
+        a {
             color: #61dafb;
-            margin-right: 15px;
+        }
+
+        a:hover {
             text-decoration: none;
         }
 
-        .menu a:hover {
-            text-decoration: underline;
+        .form-group {
+            margin-bottom: 20px;
         }
 
-        p {
-            margin-bottom: 15px;
+        .form-control {
+            background-color: #343a40;
+            color: #ffffff;
+            border: 1px solid #61dafb;
+        }
+
+        .form-control:focus {
+            background-color: #454d55;
+            color: #ffffff;
+            border: 1px solid #61dafb;
+        }
+
+        .btn-primary {
+            background-color: #61dafb;
+            border: none;
+        }
+
+        .btn-primary:hover {
+            background-color: #4285f4;
+            border: none;
         }
     </style>
-</head>
-<body>
 
     <div class="container">
-        <div class="menu">
-            <a href="/accounts/login/">Sign In</a>
-            <a href="/accounts/signup/">Sign Up</a>
-        </div>
+        <nav class="navbar">
+            <a href="/accounts/login/" class="navbar-item">Sign In</a>
+            <a href="/accounts/signup/" class="navbar-item">Sign Up</a>
+        </nav>
 
-        <h1>Change Password</h1>
+        <h1>Confirm Email Address</h1>
 
-        <form method="post" action="/accounts/password/reset/key/5-set-password/">
-            <input type="hidden" name="csrfmiddlewaretoken" value="Fv8zyX6MsNBAHkpRxwTmqotMQZrgaHp2hLoZsIDingn4D5aEQnKcQrmC0WMafizz">
-            <div class="form-group">
-                <label for="id_password1">New Password:</label>
-                <input type="password" name="password1" class="form-control" placeholder="New Password" autocomplete="new-password" required id="id_password1">
-            </div>
-            <div class="form-group">
-                <label for="id_password2">New Password (again):</label>
-                <input type="password" name="password2" class="form-control" placeholder="New Password (again)" required id="id_password2">
-            </div>
-
-            <button name="action" type="submit" class="btn btn-primary">Change Password</button>
-        </form>
+        {% if confirmation %}
+            {% user_display confirmation.email_address.user as user_display %}
+            {% if can_confirm %}
+                <p>
+                    {% blocktrans with confirmation.email_address.email as email %}Please confirm that <a href="mailto:{{ email }}">{{ email }}</a> is an email address for user {{ user_display }}.{% endblocktrans %}
+                </p>
+                {% url 'account_confirm_email' confirmation.key as action_url %}
+                <form method="post" action="{{ action_url }}" class="form-group">
+                    {% csrf_token %}
+                    <button type="submit" class="btn-primary">{% trans 'Confirm' %}</button>
+                </form>
+            {% else %}
+                <p>
+                    {% blocktrans %}Unable to confirm {{ email }} because it is already confirmed by a different account.{% endblocktrans %}
+                </p>
+            {% endif %}
+        {% else %}
+            {% url 'account_email' as email_url %}
+            <p>
+                {% blocktrans %}This email confirmation link expired or is invalid. Please <a href="{{ email_url }}">issue a new email confirmation request</a>.{% endblocktrans %}
+            </p>
+        {% endif %}
     </div>
+{% endblock content %}
 
-    <!-- Bootstrap JS and Popper.js -->
-    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-U7Uo6Csm/PQqBxysX1SDPu5znQ41Zj3IuZDz8VISVZ4eq86XFKFDK4BvPQy1g8Ifj" crossorigin="anonymous"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
-
-</body>
-</html>
