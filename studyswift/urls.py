@@ -1,6 +1,6 @@
 from django.urls import include, path
 from . import views
-from .views import CustomSignupView, dashboard #teacher_dashboard
+from .views import CustomSignupView, dashboard
 
 
 urlpatterns = [
@@ -11,7 +11,11 @@ urlpatterns = [
     path('accounts/', include('allauth.urls')),
 
     path('dashboard/', dashboard, name='dashboard'),
-    #path('teacher_dashboard/', teacher_dashboard, name='teacher_dashboard'),
+
+    path('self_rev/', views.self_rev, name='self_rev'),
+    path('flashcards/create/', views.create_flashcard, name='create_flashcard'),
+    path('flashcards/revise/', views.revise_flashcard, name='revise_flashcard'),
+    path('flashcards/test/<str:flashcard_ids>/', views.test_flashcard, name='test_flashcard'),
 
 ]
 

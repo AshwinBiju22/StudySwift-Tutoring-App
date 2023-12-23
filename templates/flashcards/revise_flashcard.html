@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Revise Flashcard</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #ecf0f1;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #ecf0f1;
+            border-radius: 12px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .navbar {
+            background-color: #3498db;
+            padding: 15px 0;
+            text-align: center;
+            color: white;
+            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .navbar h1 {
+            margin: 0;
+            font-size: 32px;
+        }
+
+        .flashcard {
+            background-color: #ffffff;
+            border: 1px solid #bdc3c7;
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 15px;
+            transition: box-shadow 0.3s ease;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .flashcard:hover {
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+        }
+
+        input[type="checkbox"] {
+            margin-right: 5px;
+        }
+
+        button {
+            background-color: #2980b9;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-right: 10px;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #1f6698;
+        }
+
+        .home-link {
+            display: block;
+            text-align: center;
+            text-decoration: none;
+            background-color: #2980b9;
+            color: white;
+            padding: 10px 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+            transition: background-color 0.3s ease;
+        }
+
+        .home-link:hover {
+            background-color: #1f6698;
+        }
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        <h1>Flashcard Revise</h1>
+    </div>
+
+    <div class="container">
+        <form method="post">
+            {% csrf_token %}
+            <h2>All Flashcards</h2>
+            {% for flashcard in flashcards %}
+                <div class="flashcard">
+                    <input type="checkbox" name="selected_flashcards" value="{{ flashcard.id }}">
+                    <label for="selected_flashcards">{{ flashcard.subject }}</label>
+                    <p>{{ flashcard.question }}</p>
+                    <p><strong>Answer:</strong> {{ flashcard.answer }}</p>
+                </div>
+            {% endfor %}
+            <button type="submit" name="delete">Delete Selected Flashcards</button>
+            <button type="submit" name="test">Test Flashcards</button>
+        </form>
+
+        <a href="{% url 'self_rev' %}" class="home-link">
+            <button>Home</button>
+        </a>
+    </div>
+</body>
+</html>

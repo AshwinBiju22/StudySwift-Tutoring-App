@@ -1,0 +1,162 @@
+{% load static %}
+
+<!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+        <!--=============== BOXICONS ===============-->
+        <link href='https://unpkg.com/boxicons@2.1.2/css/boxicons.min.css' rel='stylesheet'>
+
+        <!--=============== CSS ===============-->
+        <link rel="stylesheet" href="{% static 'css/styles.css' %}"/>
+
+        <style>
+            /* Add these styles for cool button look */
+            .button-container {
+                display: flex;
+                justify-content: space-around;
+                margin-top: 20px;
+            }
+    
+            .cool-button {
+                display: inline-block;
+                padding: 10px 20px;
+                font-size: 16px;
+                text-align: center;
+                text-decoration: none;
+                cursor: pointer;
+                border-radius: 8px;
+                transition: background-color 0.3s ease, color 0.3s ease;
+            }
+    
+            .cool-button.create {
+                background-color: #3498db;
+                color: white;
+            }
+    
+            .cool-button.revise {
+                background-color: #2ecc71;
+                color: white;
+            }
+    
+            .cool-button:hover {
+                background-color: #29b9a6;
+            }
+            .chart-container {
+                width: 400px;  /* Set the desired width */
+                height: 400px; /* Set the desired height */
+                margin: 0 auto; /* Center horizontally */
+                display: flex;
+                align-items: center; /* Center vertically */
+                justify-content: center; /* Center horizontally */
+            }
+        </style>
+
+        <title>Dashboard</title>
+    </head>
+    <body>
+        <!--=============== NAV ===============-->
+        <div class="nav" id="nav">
+            <nav class="nav__content">
+                <div class="nav__toggle" id="nav-toggle">
+                    <i class='bx bx-chevron-right' ></i>
+                </div>
+    
+                <a href="#" class="nav__logo">
+                    <i class='bx bx-book-open'></i>
+                    <span class="nav__logo-name">StudySwift</span>
+                </a>
+    
+                <div class="nav__list">
+                    <a href="{% url 'dashboard' %}" class="nav__link active-link">
+                        <i class='bx bx-grid-alt'></i>
+                        <span class="nav__name">Dashboard</span>
+                    </a>
+    
+                    <a href="#" class="nav__link">
+                        <i class='bx bx-calendar'></i>
+                        <span class="nav__name">Timetable</span>
+                    </a>
+    
+                    <a href="#" class="nav__link">
+                        <i class='bx bx-task' ></i>
+                        <span class="nav__name">Tasks</span>
+                    </a>
+    
+                    <a href="#" class="nav__link">
+                        <i class='bx bx-bar-chart-square' ></i>
+                        <span class="nav__name">Courses</span>
+                    </a>
+
+                    <a href="{% url 'self_rev' %}" class="nav__link">
+                        <i class='bx bx-book-alt'></i>
+                        <span class="nav__name">Self-Rev</span>
+                    </a>
+
+                    <a href="#" class="nav__link">
+                        <i class='bx bxs-ghost' ></i>
+                        <span class="nav__name">StudyBot</span>
+                    </a>
+
+                    <a href="#" class="nav__link">
+                        <i class='bx bxs-award'></i>
+                        <span class="nav__name">Rewards</span>
+                    </a>
+    
+                    <a href="{% url 'account_logout' %}" class="nav__link">
+                        <i class='bx bx-cog' ></i>
+                        <span class="nav__name">Settings</span>
+                    </a>
+                </div>
+            </nav>
+        </div>
+
+        <!--=============== MAIN ===============-->
+        <main class="container section">
+            <h1>Self Revision</h1>
+
+            <div class="button-container">
+            <a href="{% url 'create_flashcard' %}" class="cool-button create">Create Flashcard</a>
+            <a href="{% url 'revise_flashcard' %}" class="cool-button revise">Revise Flashcard</a>
+            </div>
+            
+            <div class="chart-container">
+                <canvas id="flashcardDoughnutChart" width="400" height="400"></canvas>
+            </div>
+            
+        </main> 
+
+        <!--=============== MAIN JS ===============-->
+        <script src="{% static 'js/main.js' %}"></script>
+
+
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                // Assuming you have passed flashcard_data from the view
+                const flashcardData = {{ chart_data|safe }};
+
+                const flashcardSubjects = flashcardData.flashcard_subjects;
+                const flashcardCounts = flashcardData.flashcard_counts;
+
+                new Chart('flashcardDoughnutChart', {
+                    type: 'doughnut',
+                    data: {
+                        labels: flashcardSubjects,
+                        datasets: [{
+                            data: flashcardCounts,
+                            backgroundColor: ['#3498db', '#e74c3c', '#2ecc71', '#f39c12', '#9b59b6', '#34495e', '#1abc9c'],
+                        }]
+                    },
+                    options: {
+                        responsive: false,
+                        maintainAspectRatio: false,
+                        legend: { position: 'bottom' },
+                    }
+                });
+            });
+        </script>
+    </body>
+</html>
