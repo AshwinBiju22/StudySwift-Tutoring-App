@@ -5,11 +5,8 @@ from .forms import CustomSignupForm, FlashcardForm
 from .models import Flashcard, UserProfile
 from django.db.models import Count 
 
-def index(request):
-    return render(request, "home/index.html")
-
-def portal(request):
-    return render(request, "login/portal.html")
+def homepage(request):
+    return render(request, "application/homepage.html")
 
 class CustomSignupView(SignupView):
     form_class = CustomSignupForm
@@ -29,16 +26,13 @@ def dashboard(request):
     return render(request, "application/dashboard.html")
 
 def self_rev(request):
-    flashcards = Flashcard.objects.all()
+    flashcards = Flashcard.objects.filter(owner=request.user)
 
-    # Count the number of flashcards for each subject
     flashcard_data = flashcards.values('subject').annotate(count=Count('subject')).order_by('subject')
     
-    # Extract subjects and counts for JavaScript
     flashcard_subjects = [data['subject'] for data in flashcard_data]
     flashcard_counts = [data['count'] for data in flashcard_data]
 
-    # Prepare data for the chart
     chart_data = {
         'flashcard_subjects': flashcard_subjects,
         'flashcard_counts': flashcard_counts,
@@ -60,7 +54,7 @@ def create_flashcard(request):
     return render(request, "flashcards/create_flashcard.html", {"form": form})
 
 def revise_flashcard(request):
-    flashcards = Flashcard.objects.order_by('subject')
+    flashcards = Flashcard.objects.filter(owner=request.user).order_by('subject')
 
     if request.method == 'POST':
         selected_flashcard_ids = request.POST.getlist('selected_flashcards')
@@ -71,6 +65,9 @@ def revise_flashcard(request):
         elif 'test' in request.POST and selected_flashcard_ids:
             flashcard_ids_str = ','.join(selected_flashcard_ids)
             return redirect('test_flashcard', flashcard_ids=flashcard_ids_str)
+        
+        elif "create" in request.POST:
+            return redirect("create_flashcard")
 
     return render(request, 'flashcards/revise_flashcard.html', {'flashcards': flashcards})
 

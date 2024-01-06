@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StudySwift</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #222; /* Dark background color */
+            color: #fff; /* White text color */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            margin: 0;
+            font-size: 3em;
+        }
+
+        main {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        a {
+            text-decoration: none;
+        }
+
+        button {
+            background-color: #3498db;
+            color: #fff;
+            border: none;
+            padding: 15px 30px;
+            font-size: 1.2em;
+            cursor: pointer;
+            margin: 10px;
+            border-radius: 8px;
+            text-decoration: none;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #2980b9;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <h1>StudySwift</h1>
+    </header>
+    <main>
+        {% if request.user.is_authenticated %}
+        <a href="{% url 'dashboard' %}">
+            <button>Sign Up</button>
+        </a>
+        {% else %}
+        <a href="{% url 'account_signup' %}">
+            <button>Sign Up</button>
+        </a>
+        {% endif %}
+        {% if request.user.is_authenticated %}
+        <a href="{% url 'dashboard' %}">
+            <button>Sign In</button>
+        </a>
+        {% else %}
+        <a href="{% url 'account_login' %}">
+            <button>Sign In</button>
+        </a>
+        {% endif %}
+    </main>
+</body>
+
+</html>

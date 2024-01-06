@@ -4,8 +4,7 @@ from .views import CustomSignupView, dashboard
 
 
 urlpatterns = [
-    path('', views.index, name='index'),
-    path("portal/", views.portal, name='portal'),
+    path("", views.homepage, name='homepage'),
 
     path('accounts/signup/', CustomSignupView.as_view(), name='account_signup'),
     path('accounts/', include('allauth.urls')),
