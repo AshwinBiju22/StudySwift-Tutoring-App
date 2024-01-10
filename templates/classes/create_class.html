@@ -1,0 +1,21 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create New Class</title>
+</head>
+<body>
+    <h1>Create New Class</h1>
+
+    <!-- Form for creating a new class -->
+    <form method="post" action="{% url 'create_class' %}">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Create Class</button>
+    </form>
+
+    <a href="{% url 'manage_classes' %}">Back to Manage Classes</a>
+</body>
+</html>

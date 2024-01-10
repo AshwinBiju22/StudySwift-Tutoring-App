@@ -1,0 +1,59 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Classes</title>
+
+    <!-- Dark Mode Styles -->
+    <style>
+        body {
+            background-color: #121212;
+            color: #ffffff;
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        .button-container {
+            margin-top: 20px;
+        }
+
+        .button {
+            background-color: #3498db;
+            color: #ffffff;
+            border: none;
+            padding: 10px 20px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+
+        .button:hover {
+            background-color: #2980b9;
+        }
+    </style>
+</head>
+<body>
+    <h1>Manage Classes</h1>
+
+    <!-- Display existing classes -->
+    <ul>
+        {% for school_class in classes %}
+        <li>{{ school_class.name }} - Code: {{ school_class.code }}
+            <button>Delete</button>
+        </li>
+        {% endfor %}
+    </ul>
+
+
+    <!-- Link to create a new class -->
+    <a href="{% url 'create_class' %}" class="button">Create New Class</a>
+    <a href="{% url 'dashboard' %}" class="button">Back to Dashboard</a>
+
+</body>
+</html>

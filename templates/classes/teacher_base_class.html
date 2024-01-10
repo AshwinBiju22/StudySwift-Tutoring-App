@@ -14,7 +14,6 @@
 
         <title>Dashboard</title>
     </head>
-
     <body>
         <!--=============== NAV ===============-->
         <div class="nav" id="nav">
@@ -29,7 +28,7 @@
                 </a>
     
                 <div class="nav__list">
-                    <a href="{% url 'dashboard' %}" class="nav__link active-link">
+                    <a href="#" class="nav__link active-link">
                         <i class='bx bx-grid-alt'></i>
                         <span class="nav__name">Dashboard</span>
                     </a>
@@ -47,22 +46,7 @@
                     <a href="{% url 'base_class' %}" class="nav__link">
                         <i class='bx bx-bar-chart-square' ></i>
                         <span class="nav__name">Classes</span>
-                    </a>
-
-                    <a href="{% url 'self_rev' %}" class="nav__link">
-                        <i class='bx bx-book-alt'></i>
-                        <span class="nav__name">Self-Rev</span>
-                    </a>
-
-                    <a href="#" class="nav__link">
-                        <i class='bx bxs-ghost' ></i>
-                        <span class="nav__name">StudyBot</span>
-                    </a>
-
-                    <a href="#" class="nav__link">
-                        <i class='bx bxs-award'></i>
-                        <span class="nav__name">Rewards</span>
-                    </a>
+                    </a>                
     
                     <a href="{% url 'account_logout' %}" class="nav__link">
                         <i class='bx bx-cog' ></i>
@@ -74,7 +58,19 @@
 
         <!--=============== MAIN ===============-->
         <main class="container section">
-            <h1>Welcome to Student Dashboard</h1>
+            <h1>Your Classes</h1>
+
+            <ul>
+                {% for school_class in classes %}
+                <li>{{ school_class.name }} - Code: {{ school_class.code }}
+                    <button>Delete</button>
+                </li>
+                {% endfor %}
+            </ul>
+
+            <div class="button-container">
+                <a href="{% url 'join_class' %}" class="cool-button create">Join Class</a>
+            </div>
 
         </main>
 

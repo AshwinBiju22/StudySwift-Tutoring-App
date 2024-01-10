@@ -74,7 +74,19 @@
 
         <!--=============== MAIN ===============-->
         <main class="container section">
-            <h1>Welcome to Student Dashboard</h1>
+            <h1>Your Classes</h1>
+
+            <ul>
+                {% for school_class in classes %}
+                <li>{{ school_class.name }} - Code: {{ school_class.code }}
+                    <button>Delete</button>
+                </li>
+                {% endfor %}
+            </ul>
+
+            <div class="button-container">
+                <a href="{% url 'join_class' %}" class="cool-button create">Join Class</a>
+            </div>
 
         </main>
 
