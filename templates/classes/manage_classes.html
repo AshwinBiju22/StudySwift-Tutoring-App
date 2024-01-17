@@ -41,19 +41,23 @@
 <body>
     <h1>Manage Classes</h1>
 
-    <!-- Display existing classes -->
+    <form method="post">
+    {% csrf_token %}
     <ul>
         {% for school_class in classes %}
         <li>{{ school_class.name }} - Code: {{ school_class.code }}
-            <button>Delete</button>
+            <input type="checkbox" name="selected_classes" value="{{ school_class.id }}">
+            <label for="selected_classes">{{ school_class.name }}</label>
         </li>
         {% endfor %}
     </ul>
 
-
-    <!-- Link to create a new class -->
+    <button type="submit" name="delete" class="button">Delete Classes</button>
     <a href="{% url 'create_class' %}" class="button">Create New Class</a>
     <a href="{% url 'dashboard' %}" class="button">Back to Dashboard</a>
+    </form>
+
+
 
 </body>
 </html>

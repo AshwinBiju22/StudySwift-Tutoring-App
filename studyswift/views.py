@@ -5,6 +5,7 @@ from .models import Flashcard, UserProfile, SchoolClass
 from django.db.models import Count
 from django.contrib import messages
 
+# PATH OF APP DIRECTORY C:\Users\ashwi\Documents\studyswift_app\studyswift\
 
 ###-------------------------------DASHBOARD/LOGIN-------------------------------###
 
@@ -84,10 +85,12 @@ def join_class(request):
 
 def manage_classes(request):
     classes = SchoolClass.objects.all()
+    if request.method == 'POST':
+        selected_classes_ids = request.POST.getlist('selected_classes')
+        if 'delete' in request.POST and selected_classes_ids:
+            SchoolClass.objects.filter(name=selected_classes_ids).delete()
+            classes = SchoolClass.objects.order_by('name')
     return render(request, "classes/manage_classes.html", {'classes': classes})
-
-def delete_class(request):
-    return render(request, "classes/delete_classes.html")
 
 ###-------------------------------SELF REVISION VIEWS-------------------------------###
 
