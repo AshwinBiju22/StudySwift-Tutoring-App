@@ -39,23 +39,29 @@
     </style>
 </head>
 <body>
-    <h1>Manage Classes</h1>
-
-    <form method="post">
-    {% csrf_token %}
+    <h2>Manage Users</h2>
+    <h3>All Users:</h3>
     <ul>
-        {% for school_class in classes %}
-        <li>{{ school_class.name }} - Code: {{ school_class.code }}
-            <input type="checkbox" name="selected_classes" value="{{ school_class.id }}">
-            <label for="selected_classes">{{ school_class.name }}</label>
-        </li>
-        {% endfor %}
+      {% for user in all_users %}
+        <li>{{ user.username }}</li>
+      {% endfor %}
     </ul>
+    <h3>All Classes:</h3>
+    {% for school_class in classes %}
+      <h4>{{ school_class.name }}</h4>
+      <form method="post" action="{% url 'manage_classes' %}">
+        {% csrf_token %}
+        <label for="user_class">User Class:</label>
+        <select name="user_class" id="user_class">
+          <option value="teacher">Teacher</option>
+          <option value="student">Student</option>
+        </select>
+        <p>{{ school_class.teachers }}</p>
 
-    <button type="submit" name="delete" class="button">Delete Classes</button>
-    <a href="{% url 'create_class' %}" class="button">Create New Class</a>
-    <a href="{% url 'dashboard' %}" class="button">Back to Dashboard</a>
-    </form>
+      </form>
+      
+    {% endfor %}
+
 
 
 

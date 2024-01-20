@@ -31,3 +31,15 @@ class SchoolClass(models.Model):
             # Generate a random 4-character code
             self.code = ''.join(random.choices(string.ascii_uppercase + string.digits, k=4))
         super().save(*args, **kwargs)
+
+    def add_student(self, student):
+        self.students.add(student)
+
+    def add_teacher(self, teacher):
+        self.teacher = teacher
+
+    def remove_student(self, student):
+        self.students.remove(student)
+
+    def remove_teacher(self):
+        self.teacher = None

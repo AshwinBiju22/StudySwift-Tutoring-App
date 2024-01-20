@@ -13,6 +13,40 @@
         <link rel="stylesheet" href="{% static 'css/styles.css' %}"/>
 
         <title>Dashboard</title>
+
+        <style>
+            .class-container {
+                margin-bottom: 20px;
+                margin-right: 1000px;
+                border: 1px solid #ddd;
+                padding: 10px;
+                border-radius: 5px;
+            }
+
+            .class-header {
+                font-size: 20px;
+                font-weight: bold;
+            }
+
+            .teacher-student-list {
+                padding-left: 20px;
+            }
+
+            .button-link {
+                display: inline-block;
+                padding: 3px 10px;
+                text-align: center;
+                text-decoration: none;
+                font-size: 16px;
+                font-weight: bold;
+                color: #fff;
+                background-color: #3e4a58;
+                border: 1px solid #515253;
+                border-radius: 5px;
+                cursor: pointer;
+                transition: background-color 0.3s;
+            }
+        </style>
     </head>
 
     <body>
@@ -74,19 +108,40 @@
 
         <!--=============== MAIN ===============-->
         <main class="container section">
+            {% include "messages.html" %}
             <h1>Your Classes</h1>
 
-            <ul>
+            <div class="row">
                 {% for school_class in classes %}
-                <li>{{ school_class.name }} - Code: {{ school_class.code }}
-                    <button>Delete</button>
-                </li>
+                <div class="col-md-6">
+                    <div class="class-container">
+                        <div class="class-header">
+                            {{ school_class.name }} - Code: {{ school_class.code }} | <a href="{% url 'leave_class' school_class.code %}" class="button-link">Leave</a>
+                        </div>
+       
+                        <div class="teacher-student-list">
+                            <h3>Teacher:</h3>
+                            {% if school_class.teacher %}
+                                <p>{{ school_class.teacher.username }}</p>
+                            {% else %}
+                                <p>No teacher assigned</p>
+                            {% endif %}
+        
+                            <h3>Students:</h3>
+                            <ul>
+                                {% for student in school_class.students.all %}
+                                    <li>{{ student.username }}</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </div>
+                </div>
                 {% endfor %}
-            </ul>
+            </div>
 
-            <button>
-                <a href="{% url 'join_class' %}">Join Class</a>
-            </button>
+            <div class="button-container">
+                <a href="{% url 'join_class' %}" class="button-link">Join Class</a>
+            </div>
 
         </main>
 

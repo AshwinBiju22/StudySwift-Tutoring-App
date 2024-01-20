@@ -2,18 +2,16 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <!-- Add your head content here -->
 </head>
 <body>
     <h1>Join Class</h1>
 
-    <!-- Form for joining a class -->
     <form method="post" action="{% url 'join_class' %}">
         {% csrf_token %}
         {{ form.as_p }}
         <button type="submit">Join Class</button>
     </form>
 
-    <a href="{% url 'dashboard' %}">Back to Dashboard</a>
+    <a href="{% url 'base_class' %}">Back to Dashboard</a>
 </body>
 </html>

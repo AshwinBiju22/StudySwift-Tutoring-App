@@ -4,6 +4,8 @@ from .forms import CustomSignupForm, FlashcardForm, SchoolClassForm, JoinClassFo
 from .models import Flashcard, UserProfile, SchoolClass
 from django.db.models import Count
 from django.contrib import messages
+from django.contrib.auth.models import User
+
 
 # PATH OF APP DIRECTORY C:\Users\ashwi\Documents\studyswift_app\studyswift\
 
@@ -35,19 +37,14 @@ def dashboard(request):
 
 def base_class(request):
     if request.user.is_authenticated:
-        try:
-            profile = request.user.userprofile
-            user = request.user
-            if profile.is_teacher:
-                classes = user.classes_taught.all()
-                return render(request, "classes/teacher_base_class.html", {'classes': classes})
-            else:
-                classes = user.classes_enrolled.all()
-                return render(request, "classes/student_base_class.html", {'classes': classes})
-        except UserProfile.DoesNotExist:
-            return render(request, "class/base_class.html.html")
-        
-    return render(request, "classes/base_class.html")
+        profile = request.user.userprofile
+        user = request.user
+        if profile.is_teacher:
+            classes = user.classes_taught.all()
+            return render(request, "classes/teacher_base_class.html", {'classes': classes})
+        else:
+            classes = user.classes_enrolled.all()
+            return render(request, "classes/student_base_class.html", {'classes': classes})
 
 def create_class(request):
     if request.method == 'POST':
@@ -78,19 +75,49 @@ def join_class(request):
                     messages.success(request, 'Joined class successfully!')
             except SchoolClass.DoesNotExist:
                 messages.error(request, 'Invalid class code. Please try again.')
-            return redirect('dashboard')
+            return redirect('base_class')
     else:
         form = JoinClassForm()
     return render(request, 'classes/join_class.html', {'form': form})
 
 def manage_classes(request):
+    all_users = User.objects.all()
     classes = SchoolClass.objects.all()
-    if request.method == 'POST':
-        selected_classes_ids = request.POST.getlist('selected_classes')
-        if 'delete' in request.POST and selected_classes_ids:
-            SchoolClass.objects.filter(name=selected_classes_ids).delete()
-            classes = SchoolClass.objects.order_by('name')
-    return render(request, "classes/manage_classes.html", {'classes': classes})
+    return render(request, 'classes/manage_classes.html', {'all_users': all_users, 'classes': classes})
+
+def admin_move_user(request, user_id, class_id, action):
+    user = User.objects.get(id=user_id)
+    school_class = SchoolClass.objects.get(id=class_id)
+
+    if action == 'add':
+        user_class = request.POST.get('user_class')
+        if user_class == 'teacher':
+            school_class.add_teacher(user)
+        elif user_class == 'student':
+            school_class.add_student(user)
+        school_class.save()
+
+    elif action == 'remove':
+        user_class = request.POST.get('user_class')
+        if user_class == 'teacher':
+            school_class.remove_teacher()
+        elif user_class == 'student':
+            school_class.remove_student(user)
+        school_class.save()
+
+    return redirect('manage_classes')
+
+def leave_class(request, code):
+    school_class = SchoolClass.objects.get(code=code)
+    user = request.user
+
+    if user == school_class.teacher:
+        school_class.remove_teacher()
+    elif user in school_class.students.all():
+        school_class.remove_student(user)
+    school_class.save()
+
+    return redirect('base_class')
 
 ###-------------------------------SELF REVISION VIEWS-------------------------------###
 
@@ -173,4 +200,4 @@ def test_flashcard(request, flashcard_ids):
 
     return render(request, 'flashcards/test_flashcard.html', {'flashcards': flashcards, 'score': score})
 
-###-------------------------------PASS/PASS/PASS/PASS-------------------------------###
+###-------------------------------ZOOM INTEGRATION-------------------------------###

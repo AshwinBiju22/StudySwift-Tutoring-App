@@ -1,6 +1,6 @@
 from django.urls import include, path
 from . import views
-from .views import CustomSignupView, dashboard
+from .views import CustomSignupView
 
 
 urlpatterns = [
@@ -9,7 +9,7 @@ urlpatterns = [
     path('accounts/signup/', CustomSignupView.as_view(), name='account_signup'),
     path('accounts/', include('allauth.urls')),
 
-    path('dashboard/', dashboard, name='dashboard'),
+    path('dashboard/', views.dashboard, name='dashboard'),
 
     path('self_rev/', views.self_rev, name='self_rev'),
     path('flashcards/create/', views.create_flashcard, name='create_flashcard'),
@@ -20,6 +20,6 @@ urlpatterns = [
     path('manage_classes/', views.manage_classes, name='manage_classes'),
     path('create_class/', views.create_class, name='create_class'),
     path('join_class/', views.join_class, name='join_class'),
-
+    path('leave_class/<str:code>/', views.leave_class, name='leave_class'),
 ]
 
