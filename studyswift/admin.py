@@ -23,3 +23,9 @@ class SchoolClassAdmin(admin.ModelAdmin):
 class FlashcardAdmin(admin.ModelAdmin):
     list_display = ('owner', 'question', 'answer', 'subject',)
     search_fields = ('question', 'subject', 'owner__username',)
+
+@admin.register(Reward)
+class RewardAdmin(admin.ModelAdmin):
+    list_display = ('cost', 'name')
+    search_fields = ('name', 'cost')
+    ordering = ('cost',)

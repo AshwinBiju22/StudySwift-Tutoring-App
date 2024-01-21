@@ -2,13 +2,20 @@ from django.db import models
 from django.contrib.auth.models import User
 import random, string
 
+class Reward(models.Model):
+    name = models.CharField(max_length=100)
+    cost = models.IntegerField(default=0)
 
+    def __str__(self):
+        return self.name
+    
 class UserProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='userprofile')
     is_teacher = models.BooleanField(default=False)
     is_admin = models.BooleanField(default=False)
     good_points = models.IntegerField(default=0)
     bad_points = models.IntegerField(default=0)
+    rewards = models.ManyToManyField(Reward, related_name='reward_locker', blank=True)
 
     def __str__(self):
         return self.user.username.capitalize()
@@ -45,3 +52,4 @@ class SchoolClass(models.Model):
 
     def remove_teacher(self):
         self.teacher = None
+

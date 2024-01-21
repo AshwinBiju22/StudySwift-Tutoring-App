@@ -1,7 +1,7 @@
 from django.shortcuts import get_object_or_404, redirect, render
 from allauth.account.views import SignupView
 from .forms import CustomSignupForm, FlashcardForm, SchoolClassForm, JoinClassForm
-from .models import Flashcard, UserProfile, SchoolClass
+from .models import Flashcard, UserProfile, SchoolClass, Reward
 from django.db.models import Count, Sum
 from django.contrib import messages
 from django.contrib.auth.models import User
@@ -154,11 +154,32 @@ def rewards_view(request):
     good_points = UserProfile.objects.filter(user=student, good_points__gt=0).aggregate(Sum('good_points'))['good_points__sum'] or 0
     bad_points = UserProfile.objects.filter(user=student, bad_points__gt=0).aggregate(Sum('bad_points'))['bad_points__sum'] or 0
 
+    rewards = Reward.objects.all()
+    user_profile = UserProfile.objects.get(user=request.user)
+    locker_rewards = user_profile.rewards.all()
+
     return render(request, "rewards/rewards.html", {
         'good_points': good_points,
         'bad_points': bad_points,
+        'rewards': rewards,
+        'user_profile': user_profile,
+        'locker_rewards': locker_rewards,
     })
 
+def purchase_reward(request, reward_id):
+    reward = Reward.objects.get(pk=reward_id)
+    user_profile = UserProfile.objects.get(user=request.user)
+
+    if user_profile.good_points >= reward.cost:
+        user_profile.good_points -= reward.cost
+        user_profile.rewards.add(reward)
+        user_profile.save()
+
+        messages.success(request, f"You've successfully purchased {reward.name}!")
+    else:
+        messages.error(request, "Not enough good points to purchase this reward.")
+
+    return redirect('rewards_view')
 
 
 
