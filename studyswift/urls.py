@@ -21,5 +21,8 @@ urlpatterns = [
     path('create_class/', views.create_class, name='create_class'),
     path('join_class/', views.join_class, name='join_class'),
     path('leave_class/<str:code>/', views.leave_class, name='leave_class'),
+
+    path('give_points/<str:student_username>/', views.give_points, name='give_points'),
+    path("rewards/", views.rewards_view, name='rewards_view'),
 ]
 

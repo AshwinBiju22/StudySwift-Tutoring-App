@@ -17,7 +17,7 @@
         <style>
             .class-container {
                 margin-bottom: 20px;
-                margin-right: 1000px;
+                margin-right: 300px;
                 border: 1px solid #ddd;
                 padding: 10px;
                 border-radius: 5px;
@@ -63,7 +63,7 @@
                 </a>
     
                 <div class="nav__list">
-                    <a href="#" class="nav__link active-link">
+                    <a href="#" class="nav__link">
                         <i class='bx bx-grid-alt'></i>
                         <span class="nav__name">Dashboard</span>
                     </a>
@@ -78,7 +78,7 @@
                         <span class="nav__name">Tasks</span>
                     </a>
     
-                    <a href="{% url 'base_class' %}" class="nav__link">
+                    <a href="{% url 'base_class' %}" class="nav__link active-link">
                         <i class='bx bx-bar-chart-square' ></i>
                         <span class="nav__name">Classes</span>
                     </a>                
@@ -115,7 +115,19 @@
                             <h3>Students:</h3>
                             <ul>
                                 {% for student in school_class.students.all %}
-                                    <li>{{ student.username }}</li>
+                                    <li>{{ student.username }} -
+                                        Good Points: {{ student.userprofile.good_points }} |
+                                        Bad Points: {{ student.userprofile.bad_points }}
+                                      </li>
+                                      <form method="post" action="{% url 'give_points' student.username %}">
+                                        {% csrf_token %}
+                                        <label for="good_points">Good Points:</label>
+                                        <input type="number" name="good_points" min="0" value="0">
+                                        <label for="bad_points">Bad Points:</label>
+                                        <input type="number" name="bad_points" min="0" value="0">
+                                        <button type="submit" name="action" value="give">Give Points</button>
+                                        <button type="submit" name="action" value="remove">Remove Points</button>
+                                      </form></li>
                                 {% endfor %}
                             </ul>
                         </div>

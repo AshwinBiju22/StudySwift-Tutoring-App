@@ -2,9 +2,11 @@ from django.shortcuts import get_object_or_404, redirect, render
 from allauth.account.views import SignupView
 from .forms import CustomSignupForm, FlashcardForm, SchoolClassForm, JoinClassForm
 from .models import Flashcard, UserProfile, SchoolClass
-from django.db.models import Count
+from django.db.models import Count, Sum
 from django.contrib import messages
 from django.contrib.auth.models import User
+from datetime import date, timedelta
+
 
 
 # PATH OF APP DIRECTORY C:\Users\ashwi\Documents\studyswift_app\studyswift\
@@ -80,6 +82,18 @@ def join_class(request):
         form = JoinClassForm()
     return render(request, 'classes/join_class.html', {'form': form})
 
+def leave_class(request, code):
+    school_class = SchoolClass.objects.get(code=code)
+    user = request.user
+
+    if user == school_class.teacher:
+        school_class.remove_teacher()
+    elif user in school_class.students.all():
+        school_class.remove_student(user)
+    school_class.save()
+
+    return redirect('base_class')
+
 def manage_classes(request):
     all_users = User.objects.all()
     classes = SchoolClass.objects.all()
@@ -107,17 +121,46 @@ def admin_move_user(request, user_id, class_id, action):
 
     return redirect('manage_classes')
 
-def leave_class(request, code):
-    school_class = SchoolClass.objects.get(code=code)
-    user = request.user
+###-------------------------------REWARDS/POINTS-------------------------------###
+def give_points(request, student_username):
+    student = User.objects.get(username=student_username)
+    teacher = request.user
+    good_points = request.POST.get('good_points', 0)
+    bad_points = request.POST.get('bad_points', 0)
+    action = request.POST.get('action')
+    
+    if teacher.userprofile.is_teacher:
+        if action == 'give':
+            student.userprofile.good_points += int(good_points)
+            student.userprofile.bad_points += int(bad_points)
 
-    if user == school_class.teacher:
-        school_class.remove_teacher()
-    elif user in school_class.students.all():
-        school_class.remove_student(user)
-    school_class.save()
+        elif action == 'remove':
+            student.userprofile.good_points -= int(good_points)
+            student.userprofile.bad_points -= int(bad_points)
+        
+        if (student.userprofile.good_points < 0):
+            student.userprofile.good_points = 0
+        if (student.userprofile.bad_points < 0):
+            student.userprofile.bad_points = 0
 
+        student.userprofile.save()
+    
     return redirect('base_class')
+
+def rewards_view(request):
+    student_username = request.user.username
+    student = User.objects.get(username=student_username)
+
+    good_points = UserProfile.objects.filter(user=student, good_points__gt=0).aggregate(Sum('good_points'))['good_points__sum'] or 0
+    bad_points = UserProfile.objects.filter(user=student, bad_points__gt=0).aggregate(Sum('bad_points'))['bad_points__sum'] or 0
+
+    return render(request, "rewards/rewards.html", {
+        'good_points': good_points,
+        'bad_points': bad_points,
+    })
+
+
+
 
 ###-------------------------------SELF REVISION VIEWS-------------------------------###
 
@@ -136,7 +179,6 @@ def self_rev(request):
 
     return render(request, 'flashcards/self_rev.html', {'chart_data': chart_data, 'flashcards': flashcards})
 
-
 def create_flashcard(request):
     if request.method == "POST":
         form = FlashcardForm(request.POST)
@@ -149,7 +191,6 @@ def create_flashcard(request):
         form = FlashcardForm()
         print("creating form")
     return render(request, "flashcards/create_flashcard.html", {"form": form})
-
 
 def revise_flashcard(request):
     flashcards = Flashcard.objects.filter(owner=request.user).order_by('subject')
@@ -168,7 +209,6 @@ def revise_flashcard(request):
             return redirect("create_flashcard")
 
     return render(request, 'flashcards/revise_flashcard.html', {'flashcards': flashcards})
-
 
 def test_flashcard(request, flashcard_ids):
     flashcard_ids_list = [int(id) for id in flashcard_ids.split(',')]
@@ -199,5 +239,3 @@ def test_flashcard(request, flashcard_ids):
             score = f"{correct_answers}/{total_questions}"
 
     return render(request, 'flashcards/test_flashcard.html', {'flashcards': flashcards, 'score': score})
-
-###-------------------------------ZOOM INTEGRATION-------------------------------###

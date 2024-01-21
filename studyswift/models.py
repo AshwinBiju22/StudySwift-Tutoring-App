@@ -7,9 +7,11 @@ class UserProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='userprofile')
     is_teacher = models.BooleanField(default=False)
     is_admin = models.BooleanField(default=False)
+    good_points = models.IntegerField(default=0)
+    bad_points = models.IntegerField(default=0)
 
     def __str__(self):
-        return self.user.username
+        return self.user.username.capitalize()
 
 class Flashcard(models.Model):
     question = models.CharField(max_length=255)

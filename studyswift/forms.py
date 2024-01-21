@@ -24,3 +24,8 @@ class SchoolClassForm(forms.ModelForm):
 
 class JoinClassForm(forms.Form):
     code = forms.CharField(max_length=4)
+
+class UserProfileForm(forms.ModelForm):
+    class Meta:
+        model = UserProfile
+        fields = ['good_points', 'bad_points']
