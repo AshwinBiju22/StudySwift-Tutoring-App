@@ -1,0 +1,22 @@
+{% extends 'application/dashboard.html' %}
+
+{% block content %}
+  <h1>Manage Homework</h1>
+  
+  <h2>Your Homework Submissions</h2>
+  {% if submissions %}
+    <ul>
+      {% for submission in submissions %}
+        <li>
+          <a href="{% url 'view_homework' homework_id=submission.homework.id %}">{{ submission.homework.title }}</a>
+          - Due: {{ submission.homework.due_date }}
+          {% if submission.completed %}
+            - Completed
+          {% endif %}
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p>You have no homework submissions.</p>
+  {% endif %}
+{% endblock %}

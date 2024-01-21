@@ -25,5 +25,12 @@ urlpatterns = [
     path('give_points/<str:student_username>/', views.give_points, name='give_points'),
     path("rewards/", views.rewards_view, name='rewards_view'),
     path('purchase_reward/<int:reward_id>/', views.purchase_reward, name='purchase_reward'),
+
+    path('homework_tasks/', views.homework_tasks, name='homework_tasks'),
+    path('create_homework/', views.create_homework, name='create_homework'),
+    path('manage_homework/', views.manage_homework, name='manage_homework'),
+    path('view_homework/<int:homework_id>/', views.view_homework, name='view_homework'),
+    path('complete_homework/<int:submission_id>/', views.complete_homework, name='complete_homework'),
+
 ]
 

@@ -1,0 +1,32 @@
+{% extends 'application/dashboard.html' %}
+{% block styles %}
+    <style>
+        .homework a {
+            display: inline-block;
+            padding: 4px 4px;
+            background-color: #34285b;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+        }
+
+        .homework a:hover {
+            background-color: #151c57;
+        }
+    </style>
+{% endblock %}
+
+
+{% block content %}
+
+  <h1>Homework Tasks</h1>
+
+  <div class="homework">
+    <h2>Options</h2>
+    <a href="{% url 'create_homework' %}">Create Homework</a>
+    <a href="{% url 'manage_homework' %}">Manage Homework</a>
+  </div>
+
+
+{% endblock %}

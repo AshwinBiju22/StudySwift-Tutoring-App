@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 import random, string
+from django.utils import timezone
 
 class Reward(models.Model):
     name = models.CharField(max_length=100)
@@ -53,3 +54,21 @@ class SchoolClass(models.Model):
     def remove_teacher(self):
         self.teacher = None
 
+class File(models.Model):
+    file = models.FileField(upload_to='homework_files/')
+    uploaded_at = models.DateTimeField(auto_now_add=True)
+
+class Homework(models.Model):
+    title = models.CharField(max_length=255)
+    description = models.TextField()
+    due_date = models.DateTimeField()
+    teacher = models.ForeignKey(User, on_delete=models.CASCADE)
+    class_assigned = models.ForeignKey(SchoolClass, on_delete=models.CASCADE)
+    files = models.ManyToManyField(File, blank=True)
+
+class HomeworkSubmission(models.Model):
+    student = models.ForeignKey(User, on_delete=models.CASCADE)
+    homework = models.ForeignKey(Homework, on_delete=models.CASCADE)
+    files = models.ManyToManyField(File, related_name='submission_files', blank=True)
+    completed = models.BooleanField(default=False)
+    completed_at = models.DateTimeField(null=True, blank=True)

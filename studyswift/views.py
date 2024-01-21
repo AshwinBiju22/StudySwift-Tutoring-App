@@ -1,11 +1,12 @@
 from django.shortcuts import get_object_or_404, redirect, render
 from allauth.account.views import SignupView
-from .forms import CustomSignupForm, FlashcardForm, SchoolClassForm, JoinClassForm
-from .models import Flashcard, UserProfile, SchoolClass, Reward
+from .forms import CustomSignupForm, FlashcardForm, SchoolClassForm, JoinClassForm, HomeworkForm, HomeworkSubmissionForm
+from .models import Flashcard, UserProfile, SchoolClass, Reward, Homework, HomeworkSubmission
 from django.db.models import Count, Sum
 from django.contrib import messages
 from django.contrib.auth.models import User
 from datetime import date, timedelta
+from django.utils import timezone
 
 
 
@@ -35,7 +36,7 @@ def dashboard(request):
 
     return render(request, "application/dashboard.html")
 
-###-------------------------------CLASSES/HOMEWORK-------------------------------###
+###-------------------------------CLASSROOM HANDLING-------------------------------###
 
 def base_class(request):
     if request.user.is_authenticated:
@@ -181,8 +182,6 @@ def purchase_reward(request, reward_id):
 
     return redirect('rewards_view')
 
-
-
 ###-------------------------------SELF REVISION VIEWS-------------------------------###
 
 def self_rev(request):
@@ -260,3 +259,71 @@ def test_flashcard(request, flashcard_ids):
             score = f"{correct_answers}/{total_questions}"
 
     return render(request, 'flashcards/test_flashcard.html', {'flashcards': flashcards, 'score': score})
+
+###-------------------------------HOMEWORK TASKS/SUBMISSION-------------------------------###
+def create_homework(request):
+    if request.method == 'POST':
+        form = HomeworkForm(request.POST, request.FILES)
+        if form.is_valid():
+            homework = form.save(commit=False)
+            homework.teacher = request.user
+            homework.save()
+
+            for file in request.FILES.getlist('files'):
+                homework.files.create(file=file)
+
+            form.save_m2m()  # Save many-to-many relationships, e.g., files
+            messages.success(request, 'Homework created successfully!')
+            return redirect('manage_homework')
+    else:
+        form = HomeworkForm()
+
+    return render(request, 'homework/create_homework.html', {'form': form})
+
+def manage_homework(request):
+    if request.user.userprofile.is_teacher:
+        # Teacher view
+        homework_list = Homework.objects.filter(teacher=request.user)
+        return render(request, 'homework/manage_homework_teacher.html', {'homework_list': homework_list})
+    else:
+        # Student view
+        submissions = HomeworkSubmission.objects.filter(student=request.user)
+        return render(request, 'homework/manage_homework_student.html', {'submissions': submissions})
+
+def view_homework(request, homework_id):
+    homework = Homework.objects.get(pk=homework_id)
+    
+    # Ensure that only students who are assigned to the class can view the homework
+    if not request.user.userprofile.is_teacher and request.user not in homework.class_assigned.students.all():
+        messages.error(request, 'You do not have permission to view this homework.')
+        return redirect('manage_homework')
+
+    submissions = HomeworkSubmission.objects.filter(homework=homework, student=request.user)
+    form = HomeworkSubmissionForm()
+
+    if request.method == 'POST':
+        form = HomeworkSubmissionForm(request.POST, request.FILES)
+        if form.is_valid():
+            submission = form.save(commit=False)
+            submission.student = request.user
+            submission.homework = homework
+            submission.save()
+            form.save_m2m()  # Save many-to-many relationships, e.g., files
+            messages.success(request, 'Homework submitted successfully!')
+            return redirect('view_homework', homework_id=homework_id)
+
+    return render(request, 'homework/view_homework.html', {'homework': homework, 'submissions': submissions, 'form': form})
+def complete_homework(request, submission_id):
+    submission = HomeworkSubmission.objects.get(pk=submission_id)
+    if submission.student == request.user:
+        submission.completed = True
+        submission.completed_at = timezone.now()
+        submission.save()
+        messages.success(request, 'Homework marked as complete!')
+        return redirect('view_homework', homework_id=submission.homework.id)
+    else:
+        messages.error(request, 'You do not have permission to complete this homework.')
+        return redirect('manage_homework')
+
+def homework_tasks(request):
+    return render(request, "homework/homework_tasks.html") 

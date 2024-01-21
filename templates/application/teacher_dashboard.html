@@ -11,6 +11,7 @@
 
         <!--=============== CSS ===============-->
         <link rel="stylesheet" href="{% static 'css/styles.css' %}"/>
+        {% block styles %}{% endblock %}
 
         <title>Dashboard</title>
     </head>
@@ -58,7 +59,7 @@
 
         <!--=============== MAIN ===============-->
         <main class="container section">
-            <h1>Welcome to Teacher Dashboard</h1>
+            {% block content %}{% endblock %}
         </main>
 
         <!--=============== MAIN JS ===============-->
