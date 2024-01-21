@@ -15,6 +15,11 @@
             text-align: center;
         }
 
+        #pointsChart {
+            width: 500px; /* Adjust the width as needed */
+            height: 500px; /* Adjust the height as needed */
+        }
+
     </style>
 {% endblock %}
 
@@ -23,7 +28,7 @@
   <h1>Rewards</h1>
 
   <div id="chart-container">
-    <canvas id="pointsChart" width="200" height="200"></canvas>
+    <canvas id="pointsChart"></canvas>
   </div>
 
 
@@ -40,6 +45,8 @@
       },
 
       options: {
+        responsive: false, // Set responsive to false to prevent automatic resizing
+        maintainAspectRatio: false,
         legend: {
           labels: {
             fontColor: 'white', // Set the label color to white
