@@ -72,3 +72,4 @@ class HomeworkSubmission(models.Model):
     files = models.ManyToManyField(File, related_name='submission_files', blank=True)
     completed = models.BooleanField(default=False)
     completed_at = models.DateTimeField(null=True, blank=True)
+    submitted = models.BooleanField(default=False)

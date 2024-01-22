@@ -42,6 +42,8 @@ class HomeworkForm(forms.ModelForm):
         'due_date': forms.TextInput(attrs={'type': 'date'}),
     }
 class HomeworkSubmissionForm(forms.ModelForm):
+    files = MultiFileField(min_num=1, max_num=5, max_file_size=1024 * 1024 * 5)
+    
     class Meta:
         model = HomeworkSubmission
         fields = ['files']

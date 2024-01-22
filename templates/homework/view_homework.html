@@ -7,20 +7,57 @@
 
   <h2>Homework Submissions</h2>
   <ul>
-    {% for submission in submissions %}
+    {% if submission %}
       <li>
         Submitted by: {{ submission.student.username }}
         {% if submission.completed %}
           - Completed at: {{ submission.completed_at }}
         {% endif %}
       </li>
-    {% endfor %}
+    {% endif %}
   </ul>
 
+  {% if not submission.submitted %}
   <h2>Submit Homework</h2>
   <form method="post" enctype="multipart/form-data">
     {% csrf_token %}
     {{ form.as_p }}
     <button type="submit">Submit Homework</button>
   </form>
+  {% endif %}
+
+  {% if submission and submission.submitted %}
+    <form method="post" action="{% url 'complete_homework' submission_id=submission.id %}">
+      {% csrf_token %}
+      <button type="submit" name="status" value="complete">Mark as Complete</button>
+      <button type="submit" name="status" value="incomplete">Mark as Incomplete</button>
+    </form>
+  {% endif %}
+
+  <h2>Files Uploaded by You</h2>
+  {% if submission %}
+    <ul>
+      {% for file in submission.files.all %}
+        <li>
+          <a href="{{ file.file.url }}" download>{{ file.file.name }}</a>
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p>No files uploaded by you.</p>
+  {% endif %}
+
+  <h2>Files Uploaded by Teacher</h2>
+  {% if homework.files.all %}
+    <ul>
+      {% for file in homework.files.all %}
+        <li>
+          <a href="{{ file.file.url }}" download>{{ file.file.name }}</a>
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p>No files uploaded by the teacher.</p>
+  {% endif %}
+
 {% endblock %}

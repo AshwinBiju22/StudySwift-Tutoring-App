@@ -287,39 +287,63 @@ def manage_homework(request):
         return render(request, 'homework/manage_homework_teacher.html', {'homework_list': homework_list})
     else:
         # Student view
+        enrolled_classes = request.user.classes_enrolled.all()
+        class_homework = []
+        for student_class in enrolled_classes:
+            homework_assignment = Homework.objects.filter(class_assigned=student_class)
+            class_homework.extend(homework_assignment)
         submissions = HomeworkSubmission.objects.filter(student=request.user)
-        return render(request, 'homework/manage_homework_student.html', {'submissions': submissions})
+        return render(request, 'homework/manage_homework_student.html', {'submissions': submissions, 'class_homework':class_homework})
 
 def view_homework(request, homework_id):
     homework = Homework.objects.get(pk=homework_id)
     
     # Ensure that only students who are assigned to the class can view the homework
-    if not request.user.userprofile.is_teacher and request.user not in homework.class_assigned.students.all():
+    if (not request.user.userprofile.is_teacher and request.user not in homework.class_assigned.students.all()) or (request.user.userprofile.is_teacher):
         messages.error(request, 'You do not have permission to view this homework.')
         return redirect('manage_homework')
+    else:
+        try:
+            submission = HomeworkSubmission.objects.get(homework=homework, student=request.user)
+        except HomeworkSubmission.DoesNotExist:
+            submission = None
 
-    submissions = HomeworkSubmission.objects.filter(homework=homework, student=request.user)
-    form = HomeworkSubmissionForm()
+        form = HomeworkSubmissionForm(instance=submission)
 
-    if request.method == 'POST':
-        form = HomeworkSubmissionForm(request.POST, request.FILES)
-        if form.is_valid():
-            submission = form.save(commit=False)
-            submission.student = request.user
-            submission.homework = homework
-            submission.save()
-            form.save_m2m()  # Save many-to-many relationships, e.g., files
-            messages.success(request, 'Homework submitted successfully!')
-            return redirect('view_homework', homework_id=homework_id)
+        if request.method == 'POST':
+            form = HomeworkSubmissionForm(request.POST, request.FILES, instance=submission)
+            
+            if form.is_valid():
+                submission = form.save(commit=False)
+                submission.student = request.user
+                submission.homework = homework
+                submission.submitted = True  # Set submitted status to True
+                submission.save()
 
-    return render(request, 'homework/view_homework.html', {'homework': homework, 'submissions': submissions, 'form': form})
+                for file in request.FILES.getlist('files'):
+                    submission.files.create(file=file)
+
+                messages.success(request, 'Homework submitted successfully!')
+                return redirect('view_homework', homework_id=homework_id)
+
+    return render(request, 'homework/view_homework.html', {'homework': homework, 'submission': submission, 'form': form})
+
 def complete_homework(request, submission_id):
     submission = HomeworkSubmission.objects.get(pk=submission_id)
     if submission.student == request.user:
-        submission.completed = True
-        submission.completed_at = timezone.now()
-        submission.save()
-        messages.success(request, 'Homework marked as complete!')
+        value = request.POST.get('status')
+        if value == 'complete':
+            submission.completed = True
+            submission.completed_at = timezone.now()
+            submission.submitted = True
+            submission.save()
+            messages.success(request, 'Homework marked as complete!')
+        if value == 'incomplete':
+            submission.completed = False  # Set completed status to False
+            submission.completed_at = None
+            submission.submitted = False  
+            submission.save()
+            messages.success(request, 'Homework marked as incomplete.')
         return redirect('view_homework', homework_id=submission.homework.id)
     else:
         messages.error(request, 'You do not have permission to complete this homework.')
