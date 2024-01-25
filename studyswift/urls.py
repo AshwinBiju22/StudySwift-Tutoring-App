@@ -1,7 +1,9 @@
 from django.urls import include, path
 from . import views
 from .views import CustomSignupView
-
+from django.conf import settings
+from django.conf.urls.static import static
+from django.contrib import admin
 
 urlpatterns = [
     path("", views.homepage, name='homepage'),
@@ -26,11 +28,13 @@ urlpatterns = [
     path("rewards/", views.rewards_view, name='rewards_view'),
     path('purchase_reward/<int:reward_id>/', views.purchase_reward, name='purchase_reward'),
 
-    path('homework_tasks/', views.homework_tasks, name='homework_tasks'),
+    #path('homework_tasks/', views.homework_tasks, name='homework_tasks'),
     path('create_homework/', views.create_homework, name='create_homework'),
     path('manage_homework/', views.manage_homework, name='manage_homework'),
     path('view_homework/<int:homework_id>/', views.view_homework, name='view_homework'),
     path('complete_homework/<int:submission_id>/', views.complete_homework, name='complete_homework'),
 
-]
+    path('update-profile/', views.update_profile, name='update_profile'),
+
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 

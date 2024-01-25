@@ -27,9 +27,15 @@ class JoinClassForm(forms.Form):
     code = forms.CharField(max_length=4)
 
 class UserProfileForm(forms.ModelForm):
+
     class Meta:
         model = UserProfile
         fields = ['good_points', 'bad_points']
+
+class UserProfileUpdateForm(forms.ModelForm):
+    class Meta:
+        model = UserProfile
+        fields = ['profile_picture']
 
 class HomeworkForm(forms.ModelForm):
     files = MultiFileField(min_num=1, max_num=5, max_file_size=1024 * 1024 * 5)

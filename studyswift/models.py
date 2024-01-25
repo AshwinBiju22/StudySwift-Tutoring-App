@@ -17,6 +17,7 @@ class UserProfile(models.Model):
     good_points = models.IntegerField(default=0)
     bad_points = models.IntegerField(default=0)
     rewards = models.ManyToManyField(Reward, related_name='reward_locker', blank=True)
+    profile_picture = models.ImageField(upload_to='profile_pics/', null=True, blank=True)
 
     def __str__(self):
         return self.user.username.capitalize()

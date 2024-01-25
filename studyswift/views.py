@@ -1,12 +1,13 @@
 from django.shortcuts import get_object_or_404, redirect, render
 from allauth.account.views import SignupView
-from .forms import CustomSignupForm, FlashcardForm, SchoolClassForm, JoinClassForm, HomeworkForm, HomeworkSubmissionForm
+from .forms import CustomSignupForm, FlashcardForm, SchoolClassForm, JoinClassForm, HomeworkForm, HomeworkSubmissionForm, UserProfileUpdateForm
 from .models import Flashcard, UserProfile, SchoolClass, Reward, Homework, HomeworkSubmission
 from django.db.models import Count, Sum
 from django.contrib import messages
 from django.contrib.auth.models import User
 from datetime import date, timedelta
 from django.utils import timezone
+from django.http import JsonResponse
 
 
 
@@ -298,7 +299,6 @@ def manage_homework(request):
 def view_homework(request, homework_id):
     homework = Homework.objects.get(pk=homework_id)
     
-    # Ensure that only students who are assigned to the class can view the homework
     if (not request.user.userprofile.is_teacher and request.user not in homework.class_assigned.students.all()) or (request.user.userprofile.is_teacher):
         messages.error(request, 'You do not have permission to view this homework.')
         return redirect('manage_homework')
@@ -350,4 +350,27 @@ def complete_homework(request, submission_id):
         return redirect('manage_homework')
 
 def homework_tasks(request):
-    return render(request, "homework/homework_tasks.html") 
+    return render(request, "homework/homework_tasks.html")
+
+###-------------------------------SETTINGS/PROFILE-------------------------------###
+def update_profile(request):
+    if request.method == 'POST':
+        profile_form = UserProfileUpdateForm(request.POST, request.FILES, instance=request.user.userprofile)
+
+        if profile_form.is_valid():
+            profile = profile_form.save(commit=False)
+            
+            if 'profile_picture' in request.FILES:
+                profile.profile_picture = request.FILES['profile_picture']
+            
+            profile.save()
+
+            messages.success(request, 'Your profile picture has been updated!')
+            return redirect('update_profile')
+        else:
+            messages.error(request, 'Please correct the errors below.')
+
+    else:
+        profile_form = UserProfileUpdateForm(instance=request.user.userprofile)
+
+    return render(request, 'application/update_profile.html', {'profile_form': profile_form})
