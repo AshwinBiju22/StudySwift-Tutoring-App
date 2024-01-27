@@ -264,7 +264,11 @@ def test_flashcard(request, flashcard_ids):
 
 ###-------------------------------HOMEWORK TASKS/SUBMISSION-------------------------------###
 def manage_homework(request):
-    return render(request, 'homework/manage_homework.html')
+    profile = request.user.userprofile
+    if profile.is_teacher:
+        return render(request, 'homework/manage_homework_teacher.html')
+    else:
+        return render(request, 'homework/manage_homework.html')
 ###-------------------------------SETTINGS/PROFILE-------------------------------###
 def update_profile(request):
     if request.method == 'POST':

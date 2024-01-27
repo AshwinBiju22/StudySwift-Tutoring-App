@@ -55,3 +55,8 @@ class SchoolClass(models.Model):
     def remove_teacher(self):
         self.teacher = None
 
+class Homework(models.Model):
+    title = models.CharField(max_length=255)
+    description = models.TextField()
+    assigned_class = models.ForeignKey(SchoolClass, on_delete=models.CASCADE, related_name='homework')
+    teacher = models.ForeignKey(User, on_delete=models.CASCADE)

@@ -48,7 +48,7 @@
     </ul>
     <h3>All Classes:</h3>
     {% for school_class in classes %}
-      <h4>{{ school_class.name }}</h4>
+      <h4>{{ school_class.name }} - {{school_class.code}}</h4>
       <form method="post" action="{% url 'manage_classes' %}">
         {% csrf_token %}
         <label for="user_class">User Class:</label>
@@ -61,6 +61,8 @@
       </form>
       
     {% endfor %}
+
+    <a href="{% url 'dashboard' %}">Back to Dashboard</a>
 
 
 

@@ -30,3 +30,7 @@ class RewardAdmin(admin.ModelAdmin):
     search_fields = ('name', 'cost')
     ordering = ('cost',)
 
+@admin.register(Homework)
+class HomeworkAdmin(admin.ModelAdmin):
+    list_display = ('title', 'teacher', 'assigned_class')
+
