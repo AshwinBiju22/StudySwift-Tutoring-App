@@ -1,0 +1,76 @@
+{% extends 'application/dashboard.html' %}
+
+{% block styles %}
+<style>
+.form-container {
+    max-width: 500px;
+    margin: auto;
+  }
+
+  .form-group {
+    margin-bottom: 20px;
+  }
+
+  label {
+    display: block;
+    margin-bottom: 5px;
+  }
+
+  input[type="text"],
+  input[type="date"] {
+    width: 100%;
+    padding: 8px;
+    box-sizing: border-box;
+  }
+
+  button {
+    background-color: #34285b;
+    color: white;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+
+  button:hover {
+    background-color: #151c57;
+  }
+</style>
+{% endblock %}
+
+
+
+{% block content %}
+  <div class="form-container">
+    <h1>Create Homework</h1>
+    <form method="post" enctype="multipart/form-data">
+      {% csrf_token %}
+      <div class="form-group">
+        <label for="{{ form.title.id_for_label }}">Title:</label>
+        {{ form.title }}
+      </div>
+
+      <div class="form-group">
+        <label for="{{ form.description.id_for_label }}">Description:</label>
+        {{ form.description }}
+      </div>
+
+      <div class="form-group">
+        <label for="{{ form.due_date.id_for_label }}">Due Date:</label>
+        {{ form.due_date }}
+      </div>
+
+      <div class="form-group">
+        <label for="{{ form.assigned_class.id_for_label }}">Assigned Class:</label>
+        {{ form.assigned_class }}
+      </div>
+
+      <div class="form-group">
+        <label for="{{ form.files.id_for_label }}">Files:</label>
+        {{ form.files }}
+      </div>
+
+      <button type="submit">Create Homework</button>
+    </form>
+  </div>
+{% endblock %}

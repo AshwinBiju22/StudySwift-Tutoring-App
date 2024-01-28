@@ -32,5 +32,5 @@ class RewardAdmin(admin.ModelAdmin):
 
 @admin.register(Homework)
 class HomeworkAdmin(admin.ModelAdmin):
-    list_display = ('title', 'teacher', 'assigned_class')
+    list_display = ('title', 'teacher', 'assigned_class', 'due_date')
 

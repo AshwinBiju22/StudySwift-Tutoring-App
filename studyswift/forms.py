@@ -1,7 +1,9 @@
 from allauth.account.forms import SignupForm
 from django import forms
-from .models import UserProfile, Flashcard, SchoolClass
+from .models import UserProfile, Flashcard, SchoolClass, Homework
 from django.contrib.auth.models import User
+from multiupload.fields import MultiFileField
+
 
 class CustomSignupForm(SignupForm):
     is_teacher = forms.BooleanField(required=False)
@@ -35,3 +37,18 @@ class UserProfileUpdateForm(forms.ModelForm):
     class Meta:
         model = UserProfile
         fields = ['profile_picture']
+
+class HomeworkForm(forms.ModelForm):
+    files = MultiFileField(min_num=1, max_num=5, max_file_size=1024 * 1024 * 5)
+
+    class Meta:
+        model = Homework
+        fields = ['title', 'description', 'due_date', 'assigned_class']
+        widgets = {
+            'due_date': forms.TextInput(attrs={'type': 'date'}),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.fields['files'].required = False

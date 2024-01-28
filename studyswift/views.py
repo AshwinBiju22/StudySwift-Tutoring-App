@@ -1,7 +1,7 @@
 from django.shortcuts import get_object_or_404, redirect, render
 from allauth.account.views import SignupView
-from .forms import CustomSignupForm, FlashcardForm, SchoolClassForm, JoinClassForm, UserProfileUpdateForm
-from .models import Flashcard, UserProfile, SchoolClass, Reward
+from .forms import CustomSignupForm, FlashcardForm, SchoolClassForm, JoinClassForm, UserProfileUpdateForm, HomeworkForm
+from .models import Flashcard, UserProfile, SchoolClass, Reward, Homework, HomeworkFile
 from django.db.models import Count, Sum
 from django.contrib import messages
 from django.contrib.auth.models import User
@@ -266,9 +266,74 @@ def test_flashcard(request, flashcard_ids):
 def manage_homework(request):
     profile = request.user.userprofile
     if profile.is_teacher:
-        return render(request, 'homework/manage_homework_teacher.html')
+        homeworks = Homework.objects.filter(teacher=request.user)
+        return render(request, 'homework/manage_homework_teacher.html', {'homeworks': homeworks})
     else:
         return render(request, 'homework/manage_homework.html')
+    
+@login_required
+def create_homework(request):
+    if request.method == 'POST':
+        form = HomeworkForm(request.POST, request.FILES)
+        if form.is_valid():
+            homework = form.save(commit=False)
+            homework.teacher = request.user
+            homework.save()
+
+            for file in request.FILES.getlist('files'):
+                homework.files.create(file=file)
+
+            form.save_m2m() 
+            messages.success(request, 'Homework created successfully!')
+
+            return redirect('manage_homework')  # Redirect to a view displaying all homework assignments
+    else:
+        form = HomeworkForm()
+
+    return render(request, 'homework/create_homework.html', {'form': form, 'classes': SchoolClass.objects.all()})
+
+@login_required
+def edit_homework(request, homework_id):
+    homework = get_object_or_404(Homework, id=homework_id)
+
+    if request.user != homework.teacher:
+        return redirect('manage_homework')
+
+    if request.method == 'POST':
+        form = HomeworkForm(request.POST, request.FILES, instance=homework)
+        if form.is_valid():
+
+            new_homework = form.save(commit=False)
+
+            if 'files' in request.FILES:
+                for file in request.FILES.getlist('files'):
+                    new_file = HomeworkFile(file=file)
+                    new_file.save()
+                    new_homework.files.add(new_file)
+            
+            new_homework.save()            
+            form.save_m2m()  
+
+            return redirect('manage_homework') 
+    else:
+        form = HomeworkForm(instance=homework)
+
+    return render(request, 'homework/edit_homework.html', {'form': form, 'homework': homework})
+
+@login_required
+def remove_file(request, file_id, homework_id):
+    file = get_object_or_404(HomeworkFile, id=file_id)
+    file.delete()
+    return redirect('edit_homework', homework_id=homework_id)
+
+@login_required
+def delete_homework(request, homework_id):
+    homework = get_object_or_404(Homework, id=homework_id)
+
+    if request.user == homework.teacher:
+        homework.delete()
+
+    return redirect('manage_homework')
 ###-------------------------------SETTINGS/PROFILE-------------------------------###
 def update_profile(request):
     if request.method == 'POST':

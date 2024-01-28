@@ -29,6 +29,10 @@ urlpatterns = [
     path('purchase_reward/<int:reward_id>/', views.purchase_reward, name='purchase_reward'),
 
     path('manage_homework/', views.manage_homework, name='manage_homework'),
+    path('create_homework/', views.create_homework, name='create_homework'),
+    path('edit_homework/<int:homework_id>/', views.edit_homework, name='edit_homework'),
+    path('delete_homework/<int:homework_id>/', views.delete_homework, name='delete_homework'),
+    path('remove_file/<int:file_id>/<int:homework_id>/', views.remove_file, name='remove_file'),
 
     path('update-profile/', views.update_profile, name='update_profile'),
 
