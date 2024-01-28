@@ -275,11 +275,11 @@ def manage_homework(request):
         
         for student_class in student_classes:
             homework = Homework.objects.filter(assigned_class=student_class)
-            for x in range(len(homework)):
-                if (homework[x]).due_date < timezone.now():
-                    missingHomeworks.extend(homework)
+            for single_homework in homework:
+                if single_homework.due_date < timezone.now():
+                    missingHomeworks.append(single_homework)
                 else:
-                    pendingHomeworks.extend(homework)
+                    pendingHomeworks.append(single_homework)
 
         return render(request, 'homework/manage_homework.html', {'missingHomeworks': missingHomeworks, 'pendingHomeworks': pendingHomeworks})
     

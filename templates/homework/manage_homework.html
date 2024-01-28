@@ -1,19 +1,47 @@
 {% extends 'application/dashboard.html' %}
 {% load tz %}
 
+{% block styles%}
+<style>
+    .homework-section {
+    margin-bottom: 20px;
+    border: 1px solid #ccc;
+    padding: 10px;
+    }
+
+    /* Style for each homework-entry */
+    .homework-entry {
+    margin-bottom: 10px;
+    padding: 10px;
+    background-color: #100764;
+    }
+
+    /* Style for links within homework-entry */
+    .homework-entry a {
+    color: #007bff;
+    text-decoration: none;
+    margin-left: 10px;
+    }
+
+    .homework-entry a:hover {
+    text-decoration: underline;
+    }
+</style>
+{% endblock %}
 
 {% block content %}
 
   <h1>Homework</h1>
   {% include "messages.html" %}
 
-  <div class="missing-homeworks">
+  <div class="homework-section missing-homeworks">
     <h2>Missing Homeworks</h2>
     {% if missingHomeworks %}
       {% for homework in missingHomeworks %}
-        <div class="missing-homework">
+        <div class="homework-entry">
           <h3>{{ homework.title }}</h3>
           <p>Due Date: {{ homework.due_date }}</p>
+          <a href="{% url 'view_homework' homework.id %}">View</a>
         </div>
       {% endfor %}
     {% else %}
@@ -21,11 +49,11 @@
     {% endif %}
   </div>
 
-  <div class="pending-homeworks">
+  <div class="homework-section pending-homeworks">
     <h2>Pending Homeworks</h2>
     {% if pendingHomeworks %}
       {% for homework in pendingHomeworks %}
-        <div class="pending-homework">
+        <div class="homework-entry">
           <h3>{{ homework.title }}</h3>
           <p>Due Date: {{ homework.due_date }}</p>
           <a href="{% url 'view_homework' homework.id %}">View</a>
