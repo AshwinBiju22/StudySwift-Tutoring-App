@@ -10,8 +10,6 @@ from django.utils import timezone
 from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required, user_passes_test
 
-
-
 # PATH OF APP DIRECTORY C:\Users\ashwi\Documents\studyswift_app\studyswift\
 
 ###-------------------------------DASHBOARD/LOGIN-------------------------------###
