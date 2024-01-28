@@ -33,6 +33,7 @@ urlpatterns = [
     path('edit_homework/<int:homework_id>/', views.edit_homework, name='edit_homework'),
     path('delete_homework/<int:homework_id>/', views.delete_homework, name='delete_homework'),
     path('remove_file/<int:file_id>/<int:homework_id>/', views.remove_file, name='remove_file'),
+    path('view_homework/<int:homework_id>/', views.view_homework, name='view_homework'),
 
     path('update-profile/', views.update_profile, name='update_profile'),
 

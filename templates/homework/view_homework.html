@@ -1,0 +1,28 @@
+{% extends 'application/dashboard.html' %}
+
+{% block content %}
+
+  <h1>Submit Homework : {{ homework.title }}</h1>
+  {% include "messages.html" %}
+  <h3>Description:</h3>
+  <p>{{ homework.description }}</p>
+  <h3>Due Date:</h3>
+  <p>{{ homework.due_date }}</p>
+  <h3>Class:</h3>
+  <p>{{ homework.assigned_class }}</p>
+
+  <h2>Teacher Files</h2>
+  {% for file in teacher_files %}
+    <p><a href="{{ file.file.url }}" download>{{ file.file.name }}</a></p>
+  {% endfor %}
+
+
+  <form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Submit</button>
+  </form>
+
+  <a href="{% url 'manage_homework' %}">Mange Homework</a>
+
+{% endblock %}

@@ -1,7 +1,7 @@
 from django.shortcuts import get_object_or_404, redirect, render
 from allauth.account.views import SignupView
-from .forms import CustomSignupForm, FlashcardForm, SchoolClassForm, JoinClassForm, UserProfileUpdateForm, HomeworkForm
-from .models import Flashcard, UserProfile, SchoolClass, Reward, Homework, HomeworkFile
+from .forms import CustomSignupForm, FlashcardForm, SchoolClassForm, JoinClassForm, UserProfileUpdateForm, HomeworkForm, HomeworkSubmissionForm, HomeworkCompletionForm
+from .models import Flashcard, UserProfile, SchoolClass, Reward, Homework, HomeworkFile, HomeworkSubmission
 from django.db.models import Count, Sum
 from django.contrib import messages
 from django.contrib.auth.models import User
@@ -269,7 +269,19 @@ def manage_homework(request):
         homeworks = Homework.objects.filter(teacher=request.user)
         return render(request, 'homework/manage_homework_teacher.html', {'homeworks': homeworks})
     else:
-        return render(request, 'homework/manage_homework.html')
+        missingHomeworks = []
+        pendingHomeworks = []
+        student_classes = request.user.classes_enrolled.all()
+        
+        for student_class in student_classes:
+            homework = Homework.objects.filter(assigned_class=student_class)
+            for x in range(len(homework)):
+                if (homework[x]).due_date < timezone.now():
+                    missingHomeworks.extend(homework)
+                else:
+                    pendingHomeworks.extend(homework)
+
+        return render(request, 'homework/manage_homework.html', {'missingHomeworks': missingHomeworks, 'pendingHomeworks': pendingHomeworks})
     
 @login_required
 def create_homework(request):
@@ -334,6 +346,43 @@ def delete_homework(request, homework_id):
         homework.delete()
 
     return redirect('manage_homework')
+
+@login_required
+def view_homework(request, homework_id):
+    homework = Homework.objects.get(id=homework_id)
+    teacher_files = homework.files.all()
+    #student_files = HomeworkSubmission.objects.filter(homework=homework, student=request.user)
+
+    #if request.method == 'POST':
+        #form = HomeworkSubmissionForm(request.POST, request.FILES, instance=homework)
+        #if form.is_valid():
+         #   new_submission = form.save(commit=False)
+          #  new_submission.user = request.user
+           # new_submission.homework = homework
+
+            #if 'files' in request.FILES:
+             #   for file in request.FILES.getlist('files'):
+              #      new_file = HomeworkSubmission(file=file)
+               #     new_file.save()
+                #    new_submission.files.add(new_file)
+            
+            #new_submission.save()            
+            #form.save_m2m()
+        
+        #completion = HomeworkCompletionForm(request.POST)
+        #if completion.is_valid():
+         #   completion.save()
+
+          #  messages.success(request, 'Homework submitted successfully!')
+           # return redirect('manage_homework')
+    #else:
+     #   form = HomeworkSubmissionForm(instance=homework)
+        
+    return render(request, 'homework/view_homework.html', {
+        'homework': homework,
+        'teacher_files': teacher_files,
+    })
+
 ###-------------------------------SETTINGS/PROFILE-------------------------------###
 def update_profile(request):
     if request.method == 'POST':

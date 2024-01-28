@@ -1,8 +1,39 @@
 {% extends 'application/dashboard.html' %}
+{% load tz %}
+
 
 {% block content %}
 
   <h1>Homework</h1>
   {% include "messages.html" %}
 
-  {% endblock %}
+  <div class="missing-homeworks">
+    <h2>Missing Homeworks</h2>
+    {% if missingHomeworks %}
+      {% for homework in missingHomeworks %}
+        <div class="missing-homework">
+          <h3>{{ homework.title }}</h3>
+          <p>Due Date: {{ homework.due_date }}</p>
+        </div>
+      {% endfor %}
+    {% else %}
+      <p>No missing homework.</p>
+    {% endif %}
+  </div>
+
+  <div class="pending-homeworks">
+    <h2>Pending Homeworks</h2>
+    {% if pendingHomeworks %}
+      {% for homework in pendingHomeworks %}
+        <div class="pending-homework">
+          <h3>{{ homework.title }}</h3>
+          <p>Due Date: {{ homework.due_date }}</p>
+          <a href="{% url 'view_homework' homework.id %}">View</a>
+        </div>
+      {% endfor %}
+    {% else %}
+      <p>No pending homework.</p>
+    {% endif %}
+  </div>
+
+{% endblock %}
