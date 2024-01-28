@@ -60,7 +60,7 @@ class HomeworkForm(forms.ModelForm):
  #       model = Homework
   #      fields = ['submissions']
 
-   # def __init__(self, *args, **kwargs):
+    #def __init__(self, *args, **kwargs):
     #    super().__init__(*args, **kwargs)
 
      #   self.fields['submissions'].required = False

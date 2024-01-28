@@ -263,6 +263,7 @@ def test_flashcard(request, flashcard_ids):
     return render(request, 'flashcards/test_flashcard.html', {'flashcards': flashcards, 'score': score})
 
 ###-------------------------------HOMEWORK TASKS/SUBMISSION-------------------------------###
+@login_required
 def manage_homework(request):
     profile = request.user.userprofile
     if profile.is_teacher:

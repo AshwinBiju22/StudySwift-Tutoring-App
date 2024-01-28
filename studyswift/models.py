@@ -21,7 +21,7 @@ class UserProfile(models.Model):
     bad_points = models.IntegerField(default=0)
     rewards = models.ManyToManyField(Reward, related_name='reward_locker', blank=True)
     profile_picture = models.ImageField(upload_to='profile_pics/', null=True, blank=True)
-
+    
     def __str__(self):
         return self.user.username.capitalize()
 
@@ -104,6 +104,6 @@ class HomeworkSubmission(models.Model):
         #super().delete(*args, **kwargs)
         
     #def __str__(self):
-    #    return str(self.file)
+     #   return str(self.file)
     
     

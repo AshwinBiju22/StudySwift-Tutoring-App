@@ -9,14 +9,15 @@
   {% for homework in homeworks %}
     <li>{{homework.assigned_class}} | {{homework.title}} | {{homework.due_date}}</li>
     <a href="{% url 'edit_homework' homework.id %}" class="nav__link">
-      <i class='bx bx-edit-alt'></i>
-      <span class="nav__name">Edit Homework</span>
-  </a>
+        <i class='bx bx-edit-alt'></i>
+        <span class="nav__name">Edit Homework</span>
+    </a>
   {% endfor %}
 
-  <a href="{% url 'create_homework' %}" class="nav__link">
+  <a href="{% url 'create_homework' %}" class="nav__link active-link">
       <i class='bx bx-edit-alt'></i>
       <span class="nav__name">Create Homework</span>
   </a>
+
 
   {% endblock %}
