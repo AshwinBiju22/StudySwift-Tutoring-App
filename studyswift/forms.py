@@ -1,6 +1,6 @@
 from allauth.account.forms import SignupForm
 from django import forms
-from .models import UserProfile, Flashcard, SchoolClass, Homework, HomeworkSubmission
+from .models import UserProfile, Flashcard, SchoolClass, Homework, HomeworkSubmission, Message
 from django.contrib.auth.models import User
 from multiupload.fields import MultiFileField
 
@@ -74,3 +74,8 @@ class HomeworkCompletionForm(forms.ModelForm):
     #    super().__init__(*args, **kwargs)
 
      #   self.fields['submissions'].required = False
+        
+class MessageForm(forms.ModelForm):
+    class Meta:
+        model = Message
+        fields = ['content']

@@ -1,13 +1,13 @@
 from django.shortcuts import get_object_or_404, redirect, render
 from allauth.account.views import SignupView
-from .forms import CustomSignupForm, FlashcardForm, SchoolClassForm, JoinClassForm, UserProfileUpdateForm, HomeworkForm, HomeworkCompletionForm#, HomeworkSubmissionForm
-from .models import Flashcard, UserProfile, SchoolClass, Reward, Homework, HomeworkFile#, HomeworkSubmission
+from .forms import CustomSignupForm, FlashcardForm, SchoolClassForm, JoinClassForm, UserProfileUpdateForm, HomeworkForm, HomeworkCompletionForm, MessageForm#, HomeworkSubmissionForm
+from .models import Flashcard, UserProfile, SchoolClass, Reward, Homework, HomeworkFile, Message#, HomeworkSubmission
 from django.db.models import Count, Sum
 from django.contrib import messages
 from django.contrib.auth.models import User
 from datetime import date, timedelta
 from django.utils import timezone
-from django.http import JsonResponse
+from django.db import models
 from django.contrib.auth.decorators import login_required, user_passes_test
 
 # PATH OF APP DIRECTORY C:\Users\ashwi\Documents\studyswift_app\studyswift\
@@ -428,3 +428,49 @@ def update_profile(request):
         return render(request, 'application/update_profile_teacher.html', {'profile_form': profile_form})
     else:
         return render(request, 'application/update_profile.html', {'profile_form': profile_form})
+    
+###-------------------------------MESSAGING SYSTEM-------------------------------###
+
+@login_required
+def send_message(request, recipient_id):
+    recipient = User.objects.get(pk=recipient_id)
+
+    if request.method == 'POST':
+        form = MessageForm(request.POST)
+        if form.is_valid():
+            message = form.save(commit=False)
+            message.sender = request.user
+            message.recipient = recipient
+            message.save()
+            return redirect('send_message', recipient_id=recipient_id)
+    else:
+        form = MessageForm()
+
+    messages = Message.objects.filter(
+        (models.Q(sender=request.user, recipient=recipient) | models.Q(sender=recipient, recipient=request.user))
+    ).order_by('timestamp')
+
+    if not request.user.userprofile.is_teacher:
+        return render(request, 'messaging/send_message.html', {'form': form, 'recipient': recipient, 'messages': messages})
+    else:
+        return render(request, 'messaging/teacher_send_message.html', {'form': form, 'recipient': recipient, 'messages': messages})
+    
+@login_required
+def inbox(request):
+    recipients = User.objects.exclude(id=request.user.id)
+    active_conversation_id = request.GET.get('recipient_id')
+    active_conversation = None
+
+    if active_conversation_id:
+        active_conversation = User.objects.get(id=active_conversation_id)
+    
+    messages = []
+    if active_conversation:
+        messages = Message.objects.filter(
+            (models.Q(sender=request.user, recipient=active_conversation) | models.Q(sender=active_conversation, recipient=request.user))
+        ).order_by('timestamp')
+
+    if not request.user.userprofile.is_teacher:
+        return render(request, 'messaging/inbox.html', {'recipients': recipients, 'active_conversation': active_conversation, 'messages': messages})
+    else:
+        return render(request, 'messaging/teacher_inbox.html', {'recipients': recipients, 'active_conversation': active_conversation, 'messages': messages})

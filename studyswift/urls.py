@@ -35,6 +35,9 @@ urlpatterns = [
     path('remove_file/<int:file_id>/<int:homework_id>/', views.remove_file, name='remove_file'),
     path('view_homework/<int:homework_id>/', views.view_homework, name='view_homework'),
 
+    path('send_message/<int:recipient_id>/', views.send_message, name='send_message'),
+    path('inbox/', views.inbox, name='inbox'),
+
     path('update-profile/', views.update_profile, name='update_profile'),
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

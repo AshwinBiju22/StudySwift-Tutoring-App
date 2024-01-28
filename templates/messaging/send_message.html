@@ -1,0 +1,90 @@
+{% extends 'application/dashboard.html' %}
+
+{% block styles %}
+<style>
+    .chat-messages {
+      max-width: 600px;
+      margin: 20px auto;
+    }
+
+    .sent {
+      background-color: #080a72;
+      text-align: right;
+      padding: 10px;
+      margin-bottom: 10px;
+      border-radius: 10px;
+    }
+
+    .received {
+      background-color: #53048c;
+      text-align: left;
+      padding: 10px;
+      margin-bottom: 10px;
+      border-radius: 10px;
+    }
+
+    form {
+      margin-top: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    form textarea {
+      width: 90%;
+      padding: 10px;
+      margin-bottom: 10px;
+      border: 1px solid #183d5c;
+      border-radius: 5px;
+    }
+
+    button {
+      background-color: #3110b8;
+      color: white;
+      padding: 10px;
+      border: none;
+      cursor: pointer;
+      border-radius: 5px;
+      width: 10%;
+      text-align: center;
+    }
+
+    form label {
+      display: block;
+      margin-bottom: 5px;
+    }
+
+    .inbox {
+        background-color: #c3c2c8;
+      color: white;
+      padding: 10px;
+      border: none;
+      cursor: pointer;
+      border-radius: 5px;
+      width: 150px;
+      text-align: center;
+    }
+</style>
+{% endblock %}
+
+
+{% block content %}
+  <h2>Chat with {{ recipient.username }}</h2>
+  <div class="chat-messages">
+    {% for message in messages %}
+      <div class="{% if message.sender == user %}sent{% else %}received{% endif %}">
+        <p>{{ message.content }}</p>
+        <span>{{ message.timestamp }}</span>
+      </div>
+    {% endfor %}
+  </div>
+  <form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Send</button>
+  </form>
+  
+    <div class="inbox">
+        <a href="{% url 'inbox' %}">Back to Inbox</a>
+    </div>
+{% endblock %}
