@@ -34,3 +34,5 @@ class RewardAdmin(admin.ModelAdmin):
 class HomeworkAdmin(admin.ModelAdmin):
     list_display = ('title', 'teacher', 'assigned_class', 'due_date')
 
+
+

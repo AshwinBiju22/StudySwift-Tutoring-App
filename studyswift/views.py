@@ -1,7 +1,7 @@
 from django.shortcuts import get_object_or_404, redirect, render
 from allauth.account.views import SignupView
-from .forms import CustomSignupForm, FlashcardForm, SchoolClassForm, JoinClassForm, UserProfileUpdateForm, HomeworkForm, HomeworkSubmissionForm, HomeworkCompletionForm
-from .models import Flashcard, UserProfile, SchoolClass, Reward, Homework, HomeworkFile, HomeworkSubmission
+from .forms import CustomSignupForm, FlashcardForm, SchoolClassForm, JoinClassForm, UserProfileUpdateForm, HomeworkForm, HomeworkCompletionForm#, HomeworkSubmissionForm
+from .models import Flashcard, UserProfile, SchoolClass, Reward, Homework, HomeworkFile#, HomeworkSubmission
 from django.db.models import Count, Sum
 from django.contrib import messages
 from django.contrib.auth.models import User
@@ -272,16 +272,21 @@ def manage_homework(request):
         missingHomeworks = []
         pendingHomeworks = []
         student_classes = request.user.classes_enrolled.all()
-        
+        completedHomeworks = Homework.objects.filter(submissions__completed=True, submissions__student=request.user)
+
         for student_class in student_classes:
             homework = Homework.objects.filter(assigned_class=student_class)
             for single_homework in homework:
-                if single_homework.due_date < timezone.now():
-                    missingHomeworks.append(single_homework)
-                else:
-                    pendingHomeworks.append(single_homework)
+                if single_homework not in completedHomeworks:
+                    if single_homework.due_date < timezone.now():
+                        missingHomeworks.append(single_homework)
+                    else:
+                        pendingHomeworks.append(single_homework)
+                
+        
 
-        return render(request, 'homework/manage_homework.html', {'missingHomeworks': missingHomeworks, 'pendingHomeworks': pendingHomeworks})
+
+        return render(request, 'homework/manage_homework.html', {'missingHomeworks': missingHomeworks, 'pendingHomeworks': pendingHomeworks, 'completedHomeworks': completedHomeworks})
     
 @login_required
 def create_homework(request):
@@ -349,8 +354,23 @@ def delete_homework(request, homework_id):
 
 @login_required
 def view_homework(request, homework_id):
-    homework = Homework.objects.get(id=homework_id)
+    homework = get_object_or_404(Homework, id=homework_id)
     teacher_files = homework.files.all()
+
+    #submission = homework.submissions.filter(student=request.user).first()
+
+    if request.method == 'POST':
+        completion_form = HomeworkCompletionForm(request.POST, instance=request.user.student_submissions.filter(homework=homework).first())
+        if completion_form.is_valid():
+            submission = completion_form.save(commit=False)
+            submission.homework = homework
+            submission.student = request.user
+            submission.save()
+            messages.success(request, 'Homework marked as completed.')
+            return redirect('view_homework', homework_id=homework_id)
+    else:
+        completion_form = HomeworkCompletionForm(instance=request.user.student_submissions.filter(homework=homework).first())
+
     #student_files = HomeworkSubmission.objects.filter(homework=homework, student=request.user)
 
     #if request.method == 'POST':
@@ -381,6 +401,7 @@ def view_homework(request, homework_id):
     return render(request, 'homework/view_homework.html', {
         'homework': homework,
         'teacher_files': teacher_files,
+        'completion_form': completion_form,
     })
 
 ###-------------------------------SETTINGS/PROFILE-------------------------------###

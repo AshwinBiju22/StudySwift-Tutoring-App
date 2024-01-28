@@ -72,23 +72,6 @@ class HomeworkFile(models.Model):
     def __str__(self):
         return str(self.file)
 
-class HomeworkSubmission(models.Model):
-    file = models.FileField(upload_to='student_uploads/', null=True, blank=True)
-    completed = models.BooleanField(default=False)
-    student = models.ForeignKey(User, on_delete=models.CASCADE, related_name='student_submissions')
-    homework = models.ForeignKey('Homework', on_delete=models.CASCADE, related_name='homework_submissions')
-
-    def delete(self, *args, **kwargs):
-        # Delete the file from the storage when the HomeworkFile is deleted
-        if self.file:
-            file_path = os.path.join(settings.MEDIA_ROOT, str(self.file))
-            if os.path.exists(file_path):
-                os.remove(file_path)
-        super().delete(*args, **kwargs)
-        
-    def __str__(self):
-        return str(self.file)
-
 class Homework(models.Model):
     title = models.CharField(max_length=255)
     description = models.TextField()
@@ -96,8 +79,31 @@ class Homework(models.Model):
     teacher = models.ForeignKey(User, on_delete=models.CASCADE)
     due_date = models.DateTimeField(default=datetime.now() + timedelta(days=7))
     files = models.ManyToManyField(HomeworkFile, related_name='homework_files', blank=True)
-    submissions = models.ManyToManyField(HomeworkSubmission, related_name='homework_submissions', blank=True)
+    students = models.ManyToManyField(User, through='HomeworkSubmission', related_name='homeworks')
 
 
+    def delete(self, *args, **kwargs):
+        # Delete associated files when the Homework is deleted
+        for file_obj in self.files.all():
+            file_obj.delete()
+
+        super().delete(*args, **kwargs)
+
+class HomeworkSubmission(models.Model):
+    #file = models.FileField(upload_to='student_uploads/', null=True, blank=True)
+    completed = models.BooleanField(default=False)
+    student = models.ForeignKey(User, on_delete=models.CASCADE, related_name='student_submissions')
+    homework = models.ForeignKey(Homework, on_delete=models.CASCADE, related_name='submissions')
+
+    #def delete(self, *args, **kwargs):
+        # Delete the file from the storage when the HomeworkFile is deleted
+     #   if self.file:
+      #      file_path = os.path.join(settings.MEDIA_ROOT, str(self.file))
+       #     if os.path.exists(file_path):
+        #        os.remove(file_path)
+        #super().delete(*args, **kwargs)
+        
+    #def __str__(self):
+    #    return str(self.file)
     
     

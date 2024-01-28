@@ -18,7 +18,7 @@
 
     /* Style for links within homework-entry */
     .homework-entry a {
-    color: #007bff;
+    color: #0f8c26;
     text-decoration: none;
     margin-left: 10px;
     }
@@ -35,7 +35,7 @@
   {% include "messages.html" %}
 
   <div class="homework-section missing-homeworks">
-    <h2>Missing Homeworks</h2>
+    <h2 style="color: rgb(205, 32, 32);">Missing Homeworks</h2>
     {% if missingHomeworks %}
       {% for homework in missingHomeworks %}
         <div class="homework-entry">
@@ -50,7 +50,7 @@
   </div>
 
   <div class="homework-section pending-homeworks">
-    <h2>Pending Homeworks</h2>
+    <h2 style="color: rgb(207, 170, 57);">Pending Homeworks</h2>
     {% if pendingHomeworks %}
       {% for homework in pendingHomeworks %}
         <div class="homework-entry">
@@ -61,6 +61,21 @@
       {% endfor %}
     {% else %}
       <p>No pending homework.</p>
+    {% endif %}
+  </div>
+
+  <div class="homework-section completed-homeworks">
+    <h2 style="color: rgb(24, 198, 24);">Completed Homeworks</h2>
+    {% if completedHomeworks %}
+        {% for completed_homework in completedHomeworks %}
+            <div class="homework-entry">
+                <h3>{{ completed_homework.title }}</h3>
+                <p>Due Date: {{ completed_homework.due_date }}</p>
+                <a href="{% url 'view_homework' completed_homework.id %}">View</a>
+            </div>
+        {% endfor %}
+    {% else %}
+      <p>No completed homework.</p>
     {% endif %}
   </div>
 

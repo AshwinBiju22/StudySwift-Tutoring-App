@@ -17,11 +17,12 @@
   {% endfor %}
 
 
-  <form method="post" enctype="multipart/form-data">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Submit</button>
-  </form>
+  <h2>Mark as Completed</h2>
+    <form method="post">
+        {% csrf_token %}
+        {{ completion_form.as_p }}
+        <button type="submit">Submit</button>
+    </form>
 
   <a href="{% url 'manage_homework' %}">Mange Homework</a>
 
