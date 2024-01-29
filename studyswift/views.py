@@ -30,11 +30,25 @@ def dashboard(request):
             elif profile.is_admin:
                 return render(request, "application/admin_dashboard.html")
             else:
-                return render(request, "application/dashboard.html")
-        except UserProfile.DoesNotExist:
-            return render(request, "application/dashboard.html")
+                #----------------Points Chart/Rewards Locker-------------------------#
+                student_username = request.user.username
+                student = User.objects.get(username=student_username)
 
-    return render(request, "application/dashboard.html")
+                good_points = UserProfile.objects.filter(user=student, good_points__gt=0).aggregate(Sum('good_points'))['good_points__sum'] or 0
+                bad_points = UserProfile.objects.filter(user=student, bad_points__gt=0).aggregate(Sum('bad_points'))['bad_points__sum'] or 0
+
+                user_profile = UserProfile.objects.get(user=request.user)
+                locker_rewards = user_profile.rewards.all()
+
+                return render(request, "application/feature_dashboard.html", {
+                        'good_points': good_points,
+                        'bad_points': bad_points,
+                        'locker_rewards': locker_rewards,
+                    })
+        except UserProfile.DoesNotExist:
+            return render(request, "application/feature_dashboard.html")
+
+    return render(request, "application/feature_dashboard.html")
 
 ###-------------------------------CLASSROOM HANDLING-------------------------------###
 
@@ -281,9 +295,6 @@ def manage_homework(request):
                         missingHomeworks.append(single_homework)
                     else:
                         pendingHomeworks.append(single_homework)
-                
-        
-
 
         return render(request, 'homework/manage_homework.html', {'missingHomeworks': missingHomeworks, 'pendingHomeworks': pendingHomeworks, 'completedHomeworks': completedHomeworks})
     
@@ -458,19 +469,21 @@ def send_message(request, recipient_id):
 @login_required
 def inbox(request):
     recipients = User.objects.exclude(id=request.user.id)
-    active_conversation_id = request.GET.get('recipient_id')
-    active_conversation = None
+    conversation_id = request.GET.get('recipient_id')
+    conversation = None
 
-    if active_conversation_id:
-        active_conversation = User.objects.get(id=active_conversation_id)
+    if conversation_id:
+        conversation = User.objects.get(id=conversation_id)
     
     messages = []
-    if active_conversation:
+    if conversation:
         messages = Message.objects.filter(
-            (models.Q(sender=request.user, recipient=active_conversation) | models.Q(sender=active_conversation, recipient=request.user))
+            (models.Q(sender=request.user, recipient=conversation) | models.Q(sender=conversation, recipient=request.user))
         ).order_by('timestamp')
 
     if not request.user.userprofile.is_teacher:
-        return render(request, 'messaging/inbox.html', {'recipients': recipients, 'active_conversation': active_conversation, 'messages': messages})
+        return render(request, 'messaging/inbox.html', {'recipients': recipients, 'messages': messages})
     else:
-        return render(request, 'messaging/teacher_inbox.html', {'recipients': recipients, 'active_conversation': active_conversation, 'messages': messages})
+        return render(request, 'messaging/teacher_inbox.html', {'recipients': recipients, 'messages': messages})
+    
+
