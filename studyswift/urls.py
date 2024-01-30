@@ -38,7 +38,13 @@ urlpatterns = [
     path('send_message/<int:recipient_id>/', views.send_message, name='send_message'),
     path('inbox/', views.inbox, name='inbox'),
 
+    path('calendar/', views.calendar_view, name='calendar_view'),
+
     path('update-profile/', views.update_profile, name='update_profile'),
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
+if settings.DEBUG:
+    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+
 

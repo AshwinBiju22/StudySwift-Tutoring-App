@@ -17,7 +17,10 @@ import openai
 OPENAI_API_KEY = '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'
 openai.api_key = OPENAI_API_KEY
 
-
+GOOGLE_CALENDAR_API_KEY = 'AIzaSyD4eEWlJDFqmLR25DSNWRIYflC6MJ76MNg'  # Optional if using API Key
+GOOGLE_CALENDAR_API_CREDENTIALS_FILE = 'C:/Users/ashwi/Documents/studyswift_app/credentials.json'
+GOOGLE_CALENDAR_API_SCOPES = ['https://www.googleapis.com/auth/calendar']
+GOOGLE_CALENDAR_API_TOKEN_FILE = 'C:/Users/ashwi/Documents/studyswift_app/token.json' 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 

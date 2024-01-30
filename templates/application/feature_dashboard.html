@@ -8,7 +8,7 @@
   <div class="dashboard-sections">
     <!-- Points Pie Chart -->
     <div class="dashboard-card-points">
-      <h2>Points Overview</h2>
+      <h2 class="black-colour">Points Overview</h2>
       <div class="chart-container">
         <canvas id="pointsChart"></canvas>
       </div>
@@ -16,10 +16,10 @@
 
     <!-- Rewards Locker -->
     <div class="dashboard-card-locker">
-      <h2>Your Locker</h2>
+      <h2 class="black-colour">Your Locker</h2>
       <div class="grid-container">
         {% if locker_rewards %}
-          <ul class="reward-list">
+          <ul class="reward-list black-colour">
             {% for reward in locker_rewards %}
               <li>{{ reward.name }}</li>
             {% endfor %}
@@ -32,7 +32,7 @@
 
     <!-- User Profile Section -->
     <div class="dashboard-card">
-      <h2>Your Profile</h2>
+      <h2 class="black-colour">Your Profile</h2>
       <div class="profile-section">
         <div class="greeting-message">
           <p>Hey {{ user.username }}!</p>
@@ -92,7 +92,7 @@
       margin: 20px;
       padding: 20px;
       border-radius: 8px;
-      background-color: #183189;
+      background-color: #c21e1b;
       box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     }
 
@@ -102,7 +102,7 @@
       margin: 20px;
       padding: 20px;
       border-radius: 8px;
-      background-color: #183189;
+      background-color: #1da3a1;
       box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     }
 
@@ -112,7 +112,7 @@
       margin: 20px;
       padding: 20px;
       border-radius: 8px;
-      background-color: #183189;
+      background-color: #95d11f;
       box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     }
 
@@ -136,14 +136,19 @@
 
     .greeting-message {
       margin-bottom: 20px;
+      color: rgb(0, 0, 0);
+    }
+
+    .black-colour {
+      color: rgb(0, 0, 0);
     }
 
     .profile-picture {
       width: 100%; /* Adjust the size as needed */
       height: 400px;
       overflow: hidden;
-      border-radius: 8px;
-      border: 2px solid #ffffff; /* Optional: add a border */
+      border-radius: 800px;
+      border: 2px solid #000000; /* Optional: add a border */
       box-shadow: 0 0 5px rgba(0, 0, 0, 0.2); /* Optional: add a box shadow */
     }
 

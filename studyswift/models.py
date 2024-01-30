@@ -5,6 +5,8 @@ from django.contrib.auth.models import User
 import random, string
 from datetime import datetime, timedelta
 from django.utils import timezone
+from .utils import get_calendar_service
+
 
 class Reward(models.Model):
     name = models.CharField(max_length=100)
@@ -80,6 +82,7 @@ class Homework(models.Model):
     due_date = models.DateTimeField(default=datetime.now() + timedelta(days=7))
     files = models.ManyToManyField(HomeworkFile, related_name='homework_files', blank=True)
     students = models.ManyToManyField(User, through='HomeworkSubmission', related_name='homeworks')
+    google_calendar_event_id = models.CharField(max_length=255, null=True, blank=True)
 
 
     def delete(self, *args, **kwargs):
@@ -89,11 +92,30 @@ class Homework(models.Model):
 
         super().delete(*args, **kwargs)
 
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        
+        service = get_calendar_service()
+
+        event = {
+            'summary': self.title,
+            'description': self.description,
+            'start': {'dateTime': self.due_date.isoformat(), 'timeZone': 'UTC'},
+            'end': {'dateTime': self.due_date.isoformat(), 'timeZone': 'UTC'},
+        }
+
+        calendar_id = 'primary'  # Use 'primary' for the user's primary calendar
+        event = service.events().insert(calendarId=calendar_id, body=event).execute()
+
+        self.google_calendar_event_id = event['id']
+        self.save()
+
 class HomeworkSubmission(models.Model):
-    #file = models.FileField(upload_to='student_uploads/', null=True, blank=True)
     completed = models.BooleanField(default=False)
     student = models.ForeignKey(User, on_delete=models.CASCADE, related_name='student_submissions')
     homework = models.ForeignKey(Homework, on_delete=models.CASCADE, related_name='submissions')
+
+    #file = models.FileField(upload_to='student_uploads/', null=True, blank=True)
 
     #def delete(self, *args, **kwargs):
         # Delete the file from the storage when the HomeworkFile is deleted

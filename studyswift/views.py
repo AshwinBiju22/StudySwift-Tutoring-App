@@ -26,7 +26,7 @@ def dashboard(request):
             profile = request.user.userprofile
             user = request.user
             if profile.is_teacher:
-                return render(request, "application/teacher_dashboard.html")
+                return render(request, "application/feature_teacher_dashboard.html")
             elif profile.is_admin:
                 return render(request, "application/admin_dashboard.html")
             else:
@@ -486,4 +486,8 @@ def inbox(request):
     else:
         return render(request, 'messaging/teacher_inbox.html', {'recipients': recipients, 'messages': messages})
     
+###-------------------------------CALENDAR SYSTEM-------------------------------###
 
+def calendar_view(request):
+    homework_events = Homework.objects.filter(google_calendar_event_id__isnull=False)
+    return render(request, 'calendar/calendar_view.html', {'homework_events': homework_events})
