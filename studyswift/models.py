@@ -5,7 +5,6 @@ from django.contrib.auth.models import User
 import random, string
 from datetime import datetime, timedelta
 from django.utils import timezone
-from .utils import get_calendar_service
 
 
 class Reward(models.Model):
@@ -82,7 +81,6 @@ class Homework(models.Model):
     due_date = models.DateTimeField(default=datetime.now() + timedelta(days=7))
     files = models.ManyToManyField(HomeworkFile, related_name='homework_files', blank=True)
     students = models.ManyToManyField(User, through='HomeworkSubmission', related_name='homeworks')
-    google_calendar_event_id = models.CharField(max_length=255, null=True, blank=True)
 
 
     def delete(self, *args, **kwargs):
@@ -91,24 +89,6 @@ class Homework(models.Model):
             file_obj.delete()
 
         super().delete(*args, **kwargs)
-
-    def save(self, *args, **kwargs):
-        super().save(*args, **kwargs)
-        
-        service = get_calendar_service()
-
-        event = {
-            'summary': self.title,
-            'description': self.description,
-            'start': {'dateTime': self.due_date.isoformat(), 'timeZone': 'UTC'},
-            'end': {'dateTime': self.due_date.isoformat(), 'timeZone': 'UTC'},
-        }
-
-        calendar_id = 'primary'  # Use 'primary' for the user's primary calendar
-        event = service.events().insert(calendarId=calendar_id, body=event).execute()
-
-        self.google_calendar_event_id = event['id']
-        self.save()
 
 class HomeworkSubmission(models.Model):
     completed = models.BooleanField(default=False)

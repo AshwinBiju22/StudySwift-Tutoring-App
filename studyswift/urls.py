@@ -34,11 +34,17 @@ urlpatterns = [
     path('delete_homework/<int:homework_id>/', views.delete_homework, name='delete_homework'),
     path('remove_file/<int:file_id>/<int:homework_id>/', views.remove_file, name='remove_file'),
     path('view_homework/<int:homework_id>/', views.view_homework, name='view_homework'),
+    path('class_leaderboard/<int:class_id>/', views.class_leaderboard, name='class_leaderboard'),
 
     path('send_message/<int:recipient_id>/', views.send_message, name='send_message'),
     path('inbox/', views.inbox, name='inbox'),
+    path('edit-message/<int:message_id>/', views.edit_message, name='edit_message'),
+    path('delete-message/<int:message_id>/', views.delete_message, name='delete_message'),
+    path('clear-chat/<int:recipient_id>/', views.clear_chat, name='clear_chat'),
 
     path('calendar/', views.calendar_view, name='calendar_view'),
+
+    #path('studybot/', views.studybot, name='studybot'),
 
     path('update-profile/', views.update_profile, name='update_profile'),
 

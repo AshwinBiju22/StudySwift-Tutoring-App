@@ -5,10 +5,10 @@ from .models import Flashcard, UserProfile, SchoolClass, Reward, Homework, Homew
 from django.db.models import Count, Sum
 from django.contrib import messages
 from django.contrib.auth.models import User
-from datetime import date, timedelta
 from django.utils import timezone
 from django.db import models
-from django.contrib.auth.decorators import login_required, user_passes_test
+from django.contrib.auth.decorators import login_required
+import re
 
 # PATH OF APP DIRECTORY C:\Users\ashwi\Documents\studyswift_app\studyswift\
 
@@ -52,6 +52,7 @@ def dashboard(request):
 
 ###-------------------------------CLASSROOM HANDLING-------------------------------###
 
+@login_required
 def base_class(request):
     if request.user.is_authenticated:
         profile = request.user.userprofile
@@ -63,6 +64,7 @@ def base_class(request):
             classes = user.classes_enrolled.all()
             return render(request, "classes/student_base_class.html", {'classes': classes})
 
+@login_required
 def create_class(request):
     if request.method == 'POST':
         form = SchoolClassForm(request.POST)
@@ -74,6 +76,7 @@ def create_class(request):
         form = SchoolClassForm()
     return render(request, 'classes/create_class.html', {'form': form})
 
+@login_required
 def join_class(request):
     if request.method == 'POST':
         form = JoinClassForm(request.POST)
@@ -97,6 +100,7 @@ def join_class(request):
         form = JoinClassForm()
     return render(request, 'classes/join_class.html', {'form': form})
 
+@login_required
 def leave_class(request, code):
     school_class = SchoolClass.objects.get(code=code)
     user = request.user
@@ -109,11 +113,13 @@ def leave_class(request, code):
 
     return redirect('base_class')
 
+@login_required
 def manage_classes(request):
     all_users = User.objects.all()
     classes = SchoolClass.objects.all()
     return render(request, 'classes/manage_classes.html', {'all_users': all_users, 'classes': classes})
 
+@login_required
 def admin_move_user(request, user_id, class_id, action):
     user = User.objects.get(id=user_id)
     school_class = SchoolClass.objects.get(id=class_id)
@@ -136,7 +142,20 @@ def admin_move_user(request, user_id, class_id, action):
 
     return redirect('manage_classes')
 
+def class_leaderboard(request, class_id):
+    school_class = SchoolClass.objects.get(id=class_id)
+    students = school_class.students.all()
+
+    # Calculate the total points (good - bad) for each student and order by it
+    students = sorted(students, key=lambda student: (student.userprofile.good_points - student.userprofile.bad_points), reverse=True)
+
+    # Create a list of dictionaries containing student and total points
+    student_data = [{'student': student, 'total_points': student.userprofile.good_points - student.userprofile.bad_points} for student in students]
+
+    return render(request, 'classes/class_leaderboard.html', {'class': school_class, 'students': student_data})
 ###-------------------------------REWARDS/POINTS-------------------------------###
+
+@login_required
 def give_points(request, student_username):
     student = User.objects.get(username=student_username)
     teacher = request.user
@@ -162,6 +181,7 @@ def give_points(request, student_username):
     
     return redirect('base_class')
 
+@login_required
 def rewards_view(request):
     student_username = request.user.username
     student = User.objects.get(username=student_username)
@@ -181,6 +201,7 @@ def rewards_view(request):
         'locker_rewards': locker_rewards,
     })
 
+@login_required
 def purchase_reward(request, reward_id):
     reward = Reward.objects.get(pk=reward_id)
     user_profile = UserProfile.objects.get(user=request.user)
@@ -198,6 +219,7 @@ def purchase_reward(request, reward_id):
 
 ###-------------------------------SELF REVISION VIEWS-------------------------------###
 
+@login_required
 def self_rev(request):
     flashcards = Flashcard.objects.filter(owner=request.user)
 
@@ -213,6 +235,7 @@ def self_rev(request):
 
     return render(request, 'flashcards/self_rev.html', {'chart_data': chart_data, 'flashcards': flashcards})
 
+@login_required
 def create_flashcard(request):
     if request.method == "POST":
         form = FlashcardForm(request.POST)
@@ -226,6 +249,7 @@ def create_flashcard(request):
         print("creating form")
     return render(request, "flashcards/create_flashcard.html", {"form": form})
 
+@login_required
 def revise_flashcard(request):
     flashcards = Flashcard.objects.filter(owner=request.user).order_by('subject')
 
@@ -244,6 +268,7 @@ def revise_flashcard(request):
 
     return render(request, 'flashcards/revise_flashcard.html', {'flashcards': flashcards})
 
+@login_required
 def test_flashcard(request, flashcard_ids):
     flashcard_ids_list = [int(id) for id in flashcard_ids.split(',')]
     flashcards = Flashcard.objects.filter(id__in=flashcard_ids_list)
@@ -311,6 +336,8 @@ def create_homework(request):
                 homework.files.create(file=file)
 
             form.save_m2m() 
+
+            homework.save_to_google_calendar()
             messages.success(request, 'Homework created successfully!')
 
             return redirect('manage_homework')  # Redirect to a view displaying all homework assignments
@@ -441,6 +468,23 @@ def update_profile(request):
         return render(request, 'application/update_profile.html', {'profile_form': profile_form})
     
 ###-------------------------------MESSAGING SYSTEM-------------------------------###
+def filter_inappropriate_content(message_content):
+    # Define a list of inappropriate words or patterns
+    inappropriate_patterns = [
+        r'\bshit\b',
+        r'\bfuck\b',
+        # Add more patterns as needed
+    ]
+
+    # Compile regular expressions
+    regex_patterns = [re.compile(pattern, re.IGNORECASE) for pattern in inappropriate_patterns]
+
+    # Check if the message contains any inappropriate content
+    for regex_pattern in regex_patterns:
+        if regex_pattern.search(message_content):
+            return True  # Inappropriate content found
+
+    return False  # No inappropriate content found
 
 @login_required
 def send_message(request, recipient_id):
@@ -452,20 +496,82 @@ def send_message(request, recipient_id):
             message = form.save(commit=False)
             message.sender = request.user
             message.recipient = recipient
-            message.save()
-            return redirect('send_message', recipient_id=recipient_id)
+
+            if filter_inappropriate_content(message.content):
+                print("Your message is inappropriate")
+                messages.error(request, 'Your message contains inappropriate content.')
+                return redirect('send_message', recipient_id=recipient_id)
+            else:
+                message.save()
+                return redirect('send_message', recipient_id=recipient_id)
+
     else:
         form = MessageForm()
 
-    messages = Message.objects.filter(
+    allmessages = Message.objects.filter(
         (models.Q(sender=request.user, recipient=recipient) | models.Q(sender=recipient, recipient=request.user))
     ).order_by('timestamp')
 
+    # Identify messages sent within the last 3 hours
+    for message in allmessages:
+        time_difference = timezone.now() - message.timestamp
+        message.editable = time_difference.total_seconds() <= 3 * 60 * 60
+        print(message.editable)
+
     if not request.user.userprofile.is_teacher:
-        return render(request, 'messaging/send_message.html', {'form': form, 'recipient': recipient, 'messages': messages})
+        return render(request, 'messaging/send_message.html', {'form': form, 'recipient': recipient, 'messages': allmessages})
     else:
-        return render(request, 'messaging/teacher_send_message.html', {'form': form, 'recipient': recipient, 'messages': messages})
+        return render(request, 'messaging/teacher_send_message.html', {'form': form, 'recipient': recipient, 'messages': allmessages})
+
+@login_required
+def edit_message(request, message_id):
+    message = get_object_or_404(Message, pk=message_id, sender=request.user)
+
+    if request.method == 'POST':
+        form = MessageForm(request.POST, instance=message)
+        if form.is_valid():
+            # Update the timestamp to the current time
+            message = form.save(commit=False)
+            message.timestamp = timezone.now()
+
+            if filter_inappropriate_content(message.content):
+                print("Your message is inappropriate")
+                messages.error(request, 'Your message contains inappropriate content.')
+                return redirect('send_message', recipient_id=message.recipient_id)
+            else:
+                message.save()
+                return redirect('send_message', recipient_id=message.recipient_id)
+        
+    else:
+        form = MessageForm(instance=message)
+
+    profile = request.user.userprofile
+
+    if profile.is_teacher:
+        return render(request, 'messaging/edit_message_teacher.html', {'form': form, 'message': message})
+    else:
+        return render(request, 'messaging/edit_message.html', {'form': form, 'message': message})
+
+@login_required
+def delete_message(request, message_id):
+    message = get_object_or_404(Message, pk=message_id, sender=request.user)
+    recipient_id = message.recipient.id
+    message.delete()
+    messages.success(request, 'Message deleted successfully.')
+    return redirect('send_message', recipient_id=recipient_id)
+
+@login_required
+def clear_chat(request, recipient_id):
+    # Assuming you have a model named `Message` with fields 'sender', 'recipient', and 'content'
+    messages_to_clear = Message.objects.filter(
+        (models.Q(sender=request.user, recipient=recipient_id) | models.Q(sender=recipient_id, recipient=request.user))
+    )
     
+    messages_to_clear.delete()
+    
+    messages.success(request, 'Chat cleared successfully.')
+    return redirect('inbox')
+
 @login_required
 def inbox(request):
     recipients = User.objects.exclude(id=request.user.id)
@@ -485,9 +591,11 @@ def inbox(request):
         return render(request, 'messaging/inbox.html', {'recipients': recipients, 'messages': messages})
     else:
         return render(request, 'messaging/teacher_inbox.html', {'recipients': recipients, 'messages': messages})
-    
+
 ###-------------------------------CALENDAR SYSTEM-------------------------------###
 
+@login_required
 def calendar_view(request):
-    homework_events = Homework.objects.filter(google_calendar_event_id__isnull=False)
-    return render(request, 'calendar/calendar_view.html', {'homework_events': homework_events})
+    return render(request, 'calendar/calendar.html')
+
+###-------------------------------STUDYBOT-------------------------------###

@@ -1,90 +1,109 @@
 {% extends 'application/dashboard.html' %}
 
 {% block styles %}
+<!-- Add the styles for the edit and delete buttons -->
 <style>
     .chat-messages {
-      max-width: 600px;
-      margin: 20px auto;
+        max-width: 600px;
+        margin: 20px auto;
     }
 
-    .sent {
-      background-color: #080a72;
-      text-align: right;
-      padding: 10px;
-      margin-bottom: 10px;
-      border-radius: 10px;
+    .sent, .received {
+        position: relative;
+        background-color: #080a72;
+        text-align: right;
+        padding: 10px;
+        margin-bottom: 10px;
+        border-radius: 10px;
     }
 
     .received {
-      background-color: #53048c;
-      text-align: left;
-      padding: 10px;
-      margin-bottom: 10px;
-      border-radius: 10px;
+        background-color: #53048c;
+        text-align: left;
+    }
+
+    .edit-delete {
+        position: absolute;
+        top: 0;
+        right: 0;
+        display: none;
+    }
+
+    .sent:hover .edit-delete, .received:hover .edit-delete {
+        display: block;
     }
 
     form {
-      margin-top: 20px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
+        margin-top: 20px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
     }
 
     form textarea {
-      width: 90%;
-      padding: 10px;
-      margin-bottom: 10px;
-      border: 1px solid #183d5c;
-      border-radius: 5px;
+        width: 90%;
+        padding: 10px;
+        margin-bottom: 10px;
+        border: 1px solid #183d5c;
+        border-radius: 5px;
     }
 
     button {
-      background-color: #3110b8;
-      color: white;
-      padding: 10px;
-      border: none;
-      cursor: pointer;
-      border-radius: 5px;
-      width: 10%;
-      text-align: center;
+        background-color: #3110b8;
+        color: white;
+        padding: 10px;
+        border: none;
+        cursor: pointer;
+        border-radius: 5px;
+        width: 10%;
+        text-align: center;
     }
 
     form label {
-      display: block;
-      margin-bottom: 5px;
+        display: block;
+        margin-bottom: 5px;
     }
 
     .inbox {
         background-color: #c3c2c8;
-      color: white;
-      padding: 10px;
-      border: none;
-      cursor: pointer;
-      border-radius: 5px;
-      width: 150px;
-      text-align: center;
+        color: white;
+        padding: 10px;
+        border: none;
+        cursor: pointer;
+        border-radius: 5px;
+        width: 150px;
+        text-align: center;
     }
 </style>
 {% endblock %}
 
-
 {% block content %}
-  <h2>Chat with {{ recipient.username }}</h2>
-  <div class="chat-messages">
+<h2>Chat with {{ recipient.username }}</h2>
+<div class="chat-messages">
     {% for message in messages %}
-      <div class="{% if message.sender == user %}sent{% else %}received{% endif %}">
+    <div class="{% if message.sender == user %}sent{% else %}received{% endif %}">
         <p>{{ message.content }}</p>
         <span>{{ message.timestamp }}</span>
-      </div>
+        {% if message.sender == user and message.editable %}
+        <div class="edit-delete">
+            <a href="{% url 'edit_message' message.id %}">Edit</a> |
+            <a href="{% url 'delete_message' message.id %}">Delete</a>
+        </div>
+        {% endif %}
+    </div>
     {% endfor %}
-  </div>
-  <form method="post">
+</div>
+<form method="post">
     {% csrf_token %}
     {{ form.as_p }}
     <button type="submit">Send</button>
-  </form>
-  
-    <div class="inbox">
-        <a href="{% url 'inbox' %}">Back to Inbox</a>
-    </div>
+</form>
+
+<div class="inbox">
+  <a href="{% url 'clear_chat' recipient_id=recipient.id %}">Clear Chat</a>
+</div>
+
+<div class="inbox">
+    <a href="{% url 'inbox' %}">Back to Inbox</a>
+</div>
 {% endblock %}

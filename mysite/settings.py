@@ -17,10 +17,14 @@ import openai
 OPENAI_API_KEY = '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'
 openai.api_key = OPENAI_API_KEY
 
-GOOGLE_CALENDAR_API_KEY = 'AIzaSyD4eEWlJDFqmLR25DSNWRIYflC6MJ76MNg'  # Optional if using API Key
-GOOGLE_CALENDAR_API_CREDENTIALS_FILE = 'C:/Users/ashwi/Documents/studyswift_app/credentials.json'
-GOOGLE_CALENDAR_API_SCOPES = ['https://www.googleapis.com/auth/calendar']
-GOOGLE_CALENDAR_API_TOKEN_FILE = 'C:/Users/ashwi/Documents/studyswift_app/token.json' 
+#GOOGLE_CLIENT_ID = '653710622345-fuh4jrg38bg2b2ussf81shgt0d1rsise.apps.googleusercontent.com'
+#GOOGLE_CLIENT_SECRET = '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'
+#GOOGLE_REDIRECT_URI = 'http://127.0.0.1:8000/calendar/'
+
+GOOGLE_CALENDAR_API_KEY = 'AIzaSyB1rCPA3zK4HbBJs5NbcdKq-_-fIixKZiw'
+GOOGLE_CLIENT_SECRET_FILE = 'C:/Users/ashwi/Documents/studyswift_app/credentials.json'
+GOOGLE_REDIRECT_URI = 'https://127.0.0.1:8000/oauth2callback'
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -55,6 +59,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     "django.contrib.sites",
+    "oauth2client",
 
     "allauth",
     "allauth.account",

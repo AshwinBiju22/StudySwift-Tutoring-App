@@ -118,6 +118,9 @@
                         <div class="class-header">
                             {{ school_class.name }} - Code: {{ school_class.code }} | <a href="{% url 'leave_class' school_class.code %}" class="button-link">Leave</a>
                         </div>
+                        <div class="class-header">
+                            <a href="{% url 'class_leaderboard' school_class.id %}" class="button-link">Leaderboard</a>
+                        </div>
        
                         <div class="teacher-student-list">
                             <h3>Teacher:</h3>

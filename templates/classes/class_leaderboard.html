@@ -1,0 +1,14 @@
+{% extends 'application/dashboard.html' %}
+
+{% block content %}
+<h2>Class Leaderboard - {{ class.name }}</h2>
+<ul>
+    {% for data in students %}
+        <li>{{ data.student.username }} - Total Points: {{ data.total_points }}</li>
+    {% endfor %}
+</ul>
+
+<div class="class-header">
+    <a href="{% url 'base_class' %}" class="button-link">Back to Classes</a>
+</div>
+{% endblock %}
