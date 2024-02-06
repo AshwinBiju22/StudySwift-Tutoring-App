@@ -1,0 +1,108 @@
+{% extends 'application/dashboard.html' %}
+
+{% block styles %}
+    <style>
+        .bot-container {
+            max-width: 600px;
+            margin: auto;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            position: relative; 
+        }
+        .bot-head {
+            width: 150px; 
+            height: 150px;
+            background-color: #f0f0f0; 
+            border-radius: 50%;
+            margin: auto;
+            margin-bottom: 20px; 
+            position: relative; 
+
+            animation: bounce 0.5s infinite alternate;
+        }
+        /* Keyframes for the bot head movement */
+        @keyframes bounce {
+            0% {
+                transform: translateY(0);
+            }
+            100% {
+                transform: translateY(-10px);
+            }
+        }
+        .bot-eye {
+            position: absolute;
+            top: 35%;
+            width: 20px;
+            height: 20px;
+            background-color: #000;
+            border-radius: 50%;
+
+        }
+        .left-eye {
+            left: 30%;
+        }
+        .right-eye {
+            right: 30%;
+        }
+        .bot-mouth {
+            position: absolute;
+            top: 100px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 50px;
+            height: 10px;
+            background-color: #000;
+            border-radius: 5px;
+            animation: moveMouth 1s infinite alternate;
+        }
+        /* Keyframes for the mouth movement */
+        @keyframes moveMouth {
+            0%, 100% {
+                height: 10px;
+            }
+            50% {
+                height: 20px;
+            }
+        }
+        .bot-response {
+            margin-top: 20px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+    <div class="bot-container">
+        <div class="bot-head">
+            <div class="bot-eye left-eye"></div>
+            <div class="bot-eye right-eye"></div>
+        </div>
+        <div class="bot-mouth"></div>
+        <div>
+            <h1>Study Bot</h1>
+            <form method="post">
+                {% csrf_token %}
+                <div class="mb-3">
+                    <label for="subjects" class="form-label">What subject do you do?</label>
+                    <input type="text" class="form-control" id="subjects" name="subjects" required>
+                </div>
+                <div class="mb-3">
+                    <label for="prompt" class="form-label">Ask a question:</label>
+                    <input type="text" class="form-control" id="prompt" name="prompt" required>
+                </div>
+                <button type="submit" class="btn btn-primary">Submit</button>
+            </form>
+        </div>
+        {% if answer %}
+        <div class="bot-response">
+            <h2>Bot Response</h2>
+            <p>{{ answer }}</p>
+        </div>
+        {% endif %}
+    </div>
+{% endblock %}

@@ -44,7 +44,7 @@ urlpatterns = [
 
     path('calendar/', views.calendar_view, name='calendar_view'),
 
-    #path('studybot/', views.studybot, name='studybot'),
+    path('studybot/', views.bot, name='studybot'),
 
     path('update-profile/', views.update_profile, name='update_profile'),
 

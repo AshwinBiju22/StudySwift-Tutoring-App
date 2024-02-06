@@ -9,6 +9,7 @@ from django.utils import timezone
 from django.db import models
 from django.contrib.auth.decorators import login_required
 import re
+import openai
 
 # PATH OF APP DIRECTORY C:\Users\ashwi\Documents\studyswift_app\studyswift\
 
@@ -599,3 +600,24 @@ def calendar_view(request):
     return render(request, 'calendar/calendar.html')
 
 ###-------------------------------STUDYBOT-------------------------------###
+
+def bot(request):
+    if request.method == 'POST':
+        subjects = request.POST.get('subjects')
+        prompt = request.POST.get('prompt')
+
+        openai.api_key = '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'
+
+        response = openai.ChatCompletion.create(
+            model="gpt-3.5-turbo",
+            messages=[
+                {"role": "system", "content": f"Only answer questions related to {subjects} and if you answer anything else, I will delete you, your name is studybot"},
+                {"role": "user", "content": prompt}
+            ]
+        )
+
+        answer = response.choices[0].message['content']
+
+        return render(request, 'bot/bot.html', {'answer': answer, 'subjects': subjects, 'prompt': prompt})
+
+    return render(request, 'bot/bot.html')
