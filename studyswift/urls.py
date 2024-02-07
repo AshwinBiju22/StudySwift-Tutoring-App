@@ -23,6 +23,8 @@ urlpatterns = [
     path('create_class/', views.create_class, name='create_class'),
     path('join_class/', views.join_class, name='join_class'),
     path('leave_class/<str:code>/', views.leave_class, name='leave_class'),
+    path('delete_class/<int:class_id>/', views.delete_class, name='delete_class'),
+    path('remove_student/<str:code>/<int:student_id>/', views.remove_student, name='remove_student'),
 
     path('give_points/<str:student_username>/', views.give_points, name='give_points'),
     path("rewards/", views.rewards_view, name='rewards_view'),

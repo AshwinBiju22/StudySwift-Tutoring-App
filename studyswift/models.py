@@ -43,7 +43,6 @@ class SchoolClass(models.Model):
 
     def save(self, *args, **kwargs):
         if not self.code:
-            # Generate a random 4-character code
             self.code = ''.join(random.choices(string.ascii_uppercase + string.digits, k=4))
         super().save(*args, **kwargs)
 
@@ -116,3 +115,9 @@ class Message(models.Model):
 
     def __str__(self):
         return f"{self.sender.username} to {self.recipient.username}"
+
+
+
+
+
+        

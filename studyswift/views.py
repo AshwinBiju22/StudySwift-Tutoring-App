@@ -10,6 +10,7 @@ from django.db import models
 from django.contrib.auth.decorators import login_required
 import re
 import openai
+from django.db.models import Q
 
 # PATH OF APP DIRECTORY C:\Users\ashwi\Documents\studyswift_app\studyswift\
 
@@ -76,6 +77,21 @@ def create_class(request):
     else:
         form = SchoolClassForm()
     return render(request, 'classes/create_class.html', {'form': form})
+
+@login_required
+def delete_class(request, class_id):
+    school_class = get_object_or_404(SchoolClass, pk=class_id)
+    school_class.delete()
+    messages.success(request, 'Class deleted successfully!')
+    return redirect('manage_classes')
+
+@login_required
+def remove_student(request, code, student_id):
+    school_class = get_object_or_404(SchoolClass, code=code)
+    student = get_object_or_404(User, pk=student_id)
+    school_class.remove_student(student)
+    messages.success(request, 'Student deleted successfully!')
+    return redirect('manage_classes')
 
 @login_required
 def join_class(request):
@@ -575,7 +591,18 @@ def clear_chat(request, recipient_id):
 
 @login_required
 def inbox(request):
-    recipients = User.objects.exclude(id=request.user.id)
+    if request.user.userprofile.is_teacher:
+        # If the user is a teacher, allow messaging all teachers and only students in their classes
+        recipients = User.objects.filter(
+            Q(userprofile__is_teacher=True) | 
+            Q(userprofile__is_teacher=False, classes_enrolled__in=request.user.classes_taught.all())
+        ).exclude(id=request.user.id)
+    else:
+        # If the user is a student, allow messaging their teachers and only students in their classes
+        recipients = User.objects.filter(
+            Q(userprofile__is_teacher=True, classes_taught__in=request.user.classes_enrolled.all()) |
+            Q(userprofile__is_teacher=False, classes_enrolled__in=request.user.classes_enrolled.all())
+        ).exclude(id=request.user.id)
     conversation_id = request.GET.get('recipient_id')
     conversation = None
 
@@ -621,3 +648,10 @@ def bot(request):
         return render(request, 'bot/bot.html', {'answer': answer, 'subjects': subjects, 'prompt': prompt})
 
     return render(request, 'bot/bot.html')
+
+
+
+
+
+
+

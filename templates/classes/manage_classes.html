@@ -40,6 +40,7 @@
 </head>
 <body>
     <h2>Manage Users</h2>
+    {% include "messages.html" %}
     <h3>All Users:</h3>
     <ul>
       {% for user in all_users %}
@@ -52,17 +53,22 @@
       <form method="post" action="{% url 'manage_classes' %}">
         {% csrf_token %}
         <label for="user_class">User Class:</label>
-        <select name="user_class" id="user_class">
-          <option value="teacher">Teacher</option>
-          <option value="student">Student</option>
-        </select>
-        <p>{{ school_class.teachers }}</p>
-
+        <p>Teacher : {{ school_class.teacher }}</p>
+        <p>Students : </p>
+        {% for student in school_class.students.all %}
+          <li>
+            {{ student }}
+            <a href="{% url 'remove_student' school_class.code student.id %}" class="btn btn-danger">Delete Student</a>
+          </li>
+        {% endfor %}
       </form>
-      
+      <a href="{% url 'delete_class' school_class.id %}" class="btn btn-danger">Delete Class</a>
+
     {% endfor %}
 
+    <div>
     <a href="{% url 'dashboard' %}">Back to Dashboard</a>
+    </div>
 
 
 
