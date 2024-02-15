@@ -40,5 +40,5 @@ class EventAdmin(admin.ModelAdmin):
 
 @admin.register(AcademicEvent)
 class AcademicEventAdmin(admin.ModelAdmin):
-    list_display = ('date', 'title', 'location')
+    list_display = ('date', 'title', 'subject')
 

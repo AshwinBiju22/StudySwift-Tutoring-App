@@ -626,6 +626,19 @@ def inbox(request):
 ###-------------------------------CALENDAR SYSTEM-------------------------------###
 
 class Scraper():
+    SUBJECT_MAPPING = {
+        'Engineering and Technology': ['engineering', 'technology', 'innovations', 'nanotechnology', 'robotics'],
+        'Medicine and Healthcare': ['medicine', 'healthcare', 'biology', 'biotechnology', 'medicial', 'biological', 'health', 'diseases'],
+        'Education and Pedagogy': ['education', 'teaching', 'learning', 'pedagogy'],
+        'Business and Economics': ['business', 'economics', 'finance', 'management'],
+        'Environmental Science and Sustainability': ['environment', 'sustainability', 'climate change'],
+        'Arts and Humanities': ['arts', 'humanities', 'literature', 'culture'],
+        'Computer Science and Information Technology': ['computer science', 'information technology', 'programming', 'artificial', 'data'],
+        'Social Sciences and Humanities': ['social science', 'sociology', 'psychology', 'anthropology'],
+        'Mathematics and Statistics': ['mathematics', 'statistics', 'data analysis'],
+        'Law and Legal Studies': ['law', 'legal studies', 'jurisprudence'],
+        'Science' : ['physics', 'energy']
+    }
 
     def scrapedata(self, tag):
         url = f'https://www.allconferencealert.com/london.html?page={tag}'
@@ -634,8 +647,6 @@ class Scraper():
         print(response.status_code)
 
         if response.status_code == 200:
-            table_contents = []
-            # Find all table rows
             rows = response.html.find('div.topic-detail-page div.services-country-grids div.col-sm-9')
             for row in rows:
                 # Extract data from each table cell in the row
@@ -648,7 +659,9 @@ class Scraper():
                     conference_title = cells[x+1].text.strip()
                     conference_location = cells[x+2].text.strip()
 
-                    temp = [conference_date, conference_title, conference_location]
+                    conference_subject = self.get_subject(conference_title)
+
+                    temp = [conference_date, conference_title, conference_location, conference_subject]
                     conference_list.append(temp) 
 
             return conference_list
@@ -670,6 +683,14 @@ class Scraper():
         # Format the date string
         formatted_date_str = f"{year}-{month_map[month]}-{day}"
         return formatted_date_str
+    
+    def get_subject(self, title):
+        # Iterate through the subject mapping and check if any keyword matches the conference title
+        for subject, keywords in self.SUBJECT_MAPPING.items():
+            for keyword in keywords:
+                if keyword.lower() in title.lower():
+                    return subject
+        return 'Other'
 
 
 @login_required
@@ -683,14 +704,20 @@ def calendar_view(request):
             date = conference[0]
             title = conference[1]
             location = conference[2]
+            subject = conference[3]
 
-            academic_event = AcademicEvent(date=date, title=title, location=location)
-            academic_event.save()
+            existing_academic_event = AcademicEvent.objects.filter(date=date, title=title).exists()
+
+            if not existing_academic_event:
+                academic_event = AcademicEvent(date=date, title=title, location=location, subject=subject)
+                academic_event.save()
 
     events = Event.objects.filter(user=user)
-
+    
+    selected_subject = request.GET.get('subject')
     current_datetime = timezone.now()
-    academic_events = AcademicEvent.objects.filter(date__gt=current_datetime)
+    academic_events = AcademicEvent.objects.filter(date__gt=current_datetime, subject=selected_subject)
+
 
 
     return render(request, 'calendar/base_calendar.html', {'events': events, 'academic_events':academic_events})
