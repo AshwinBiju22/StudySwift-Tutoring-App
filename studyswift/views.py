@@ -1,7 +1,7 @@
 from django.shortcuts import get_object_or_404, redirect, render
 from allauth.account.views import SignupView
-from .forms import CustomSignupForm, FlashcardForm, SchoolClassForm, JoinClassForm, UserProfileUpdateForm, HomeworkForm, HomeworkCompletionForm, MessageForm#, HomeworkSubmissionForm
-from .models import Flashcard, UserProfile, SchoolClass, Reward, Homework, HomeworkFile, Message#, HomeworkSubmission
+from .forms import CustomSignupForm, FlashcardForm, SchoolClassForm, JoinClassForm, UserProfileUpdateForm, HomeworkForm, HomeworkCompletionForm, MessageForm, EventForm#, HomeworkSubmissionForm
+from .models import Flashcard, UserProfile, SchoolClass, Reward, Homework, HomeworkFile, Message, Event, AcademicEvent#, HomeworkSubmission
 from django.db.models import Count, Sum
 from django.contrib import messages
 from django.contrib.auth.models import User
@@ -11,6 +11,9 @@ from django.contrib.auth.decorators import login_required
 import re
 import openai
 from django.db.models import Q
+from requests_html import HTMLSession
+from datetime import datetime
+
 
 # PATH OF APP DIRECTORY C:\Users\ashwi\Documents\studyswift_app\studyswift\
 
@@ -622,9 +625,99 @@ def inbox(request):
 
 ###-------------------------------CALENDAR SYSTEM-------------------------------###
 
+class Scraper():
+
+    def scrapedata(self, tag):
+        url = f'https://www.allconferencealert.com/london.html?page={tag}'
+        session = HTMLSession()
+        response = session.get(url)
+        print(response.status_code)
+
+        if response.status_code == 200:
+            table_contents = []
+            # Find all table rows
+            rows = response.html.find('div.topic-detail-page div.services-country-grids div.col-sm-9')
+            for row in rows:
+                # Extract data from each table cell in the row
+                cells = row.find('td')
+
+                conference_list = []
+                for x in range(0, len(cells), 3):
+                    conference_date_str = cells[x].text.strip()
+                    conference_date = self.format_date(conference_date_str)
+                    conference_title = cells[x+1].text.strip()
+                    conference_location = cells[x+2].text.strip()
+
+                    temp = [conference_date, conference_title, conference_location]
+                    conference_list.append(temp) 
+
+            return conference_list
+        else:
+            print("Failed to fetch data.")
+            return None
+        
+    def format_date(self, date_str):
+        # Split the date string into day and month parts
+        day, month = date_str.split()
+        # Assuming the current year is 2024
+        year = '2024'
+        # Map month abbreviation to its numeric representation
+        month_map = {
+            'Jan': '01', 'Feb': '02', 'Mar': '03', 'Apr': '04',
+            'May': '05', 'Jun': '06', 'Jul': '07', 'Aug': '08',
+            'Sep': '09', 'Oct': '10', 'Nov': '11', 'Dec': '12'
+        }
+        # Format the date string
+        formatted_date_str = f"{year}-{month_map[month]}-{day}"
+        return formatted_date_str
+
+
 @login_required
 def calendar_view(request):
-    return render(request, 'calendar/calendar.html')
+    user = request.user
+
+    scraper = Scraper()
+    table_data = scraper.scrapedata(tag='2')
+    if table_data:
+        for conference in table_data:
+            date = conference[0]
+            title = conference[1]
+            location = conference[2]
+
+            academic_event = AcademicEvent(date=date, title=title, location=location)
+            academic_event.save()
+
+    events = Event.objects.filter(user=user)
+
+    current_datetime = timezone.now()
+    academic_events = AcademicEvent.objects.filter(date__gt=current_datetime)
+
+
+    return render(request, 'calendar/base_calendar.html', {'events': events, 'academic_events':academic_events})
+
+@login_required
+def add_event(request):
+    if request.method == 'POST':
+        form = EventForm(request.POST)
+        if form.is_valid():
+            event = form.save(commit=False)
+            event.user = request.user
+            event.save()
+            return redirect('calendar_view')
+    else:
+        form = EventForm()
+    return render(request, 'calendar/add_event.html', {'form': form})
+
+@login_required
+def delete_event(request, event_id):
+    event = get_object_or_404(Event, pk=event_id)
+
+    if event.user != request.user:
+        messages.warning("You cannot delete this")
+
+    event.delete()
+    return redirect('calendar_view')
+
 
 ###-------------------------------STUDYBOT-------------------------------###
 

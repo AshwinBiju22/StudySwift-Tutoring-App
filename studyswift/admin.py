@@ -34,5 +34,11 @@ class RewardAdmin(admin.ModelAdmin):
 class HomeworkAdmin(admin.ModelAdmin):
     list_display = ('title', 'teacher', 'assigned_class', 'due_date')
 
+@admin.register(Event)
+class EventAdmin(admin.ModelAdmin):
+    list_display = ('user', 'title', 'start_datetime', 'end_datetime')
 
+@admin.register(AcademicEvent)
+class AcademicEventAdmin(admin.ModelAdmin):
+    list_display = ('date', 'title', 'location')
 

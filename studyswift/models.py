@@ -22,7 +22,7 @@ class UserProfile(models.Model):
     bad_points = models.IntegerField(default=0)
     rewards = models.ManyToManyField(Reward, related_name='reward_locker', blank=True)
     profile_picture = models.ImageField(upload_to='profile_pics/', null=True, blank=True)
-    
+
     def __str__(self):
         return self.user.username.capitalize()
 
@@ -116,7 +116,16 @@ class Message(models.Model):
     def __str__(self):
         return f"{self.sender.username} to {self.recipient.username}"
 
+class Event(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    title = models.CharField(max_length=100)
+    start_datetime = models.DateTimeField()
+    end_datetime = models.DateTimeField()
 
+class AcademicEvent(models.Model):
+    date = models.DateTimeField()
+    title = models.CharField(max_length=100)
+    location = models.CharField(max_length=100)
 
 
 

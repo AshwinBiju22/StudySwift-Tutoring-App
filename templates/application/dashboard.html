@@ -13,6 +13,12 @@
         <!--=============== CSS ===============-->
         <link rel="stylesheet" href="{% static 'css/styles.css' %}"/>
         <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/5.10.1/main.min.css">
+        <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/5.10.1/main.min.js"></script>
+        
         {% block chart_js %}{% endblock %}
         {% block styles %}{% endblock %}
 
@@ -38,7 +44,7 @@
                         <span class="nav__name">Dashboard</span>
                     </a>
     
-                    <a href="#" class="nav__link">
+                    <a href="{% url 'calendar_view' %}" class="nav__link">
                         <i class='bx bx-calendar'></i>
                         <span class="nav__name">Timetable</span>
                     </a>

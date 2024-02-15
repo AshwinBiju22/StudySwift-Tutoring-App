@@ -17,14 +17,6 @@ import openai
 OPENAI_API_KEY = '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'
 openai.api_key = OPENAI_API_KEY
 
-#GOOGLE_CLIENT_ID = '653710622345-fuh4jrg38bg2b2ussf81shgt0d1rsise.apps.googleusercontent.com'
-#GOOGLE_CLIENT_SECRET = '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'
-#GOOGLE_REDIRECT_URI = 'http://127.0.0.1:8000/calendar/'
-
-GOOGLE_CALENDAR_API_KEY = 'AIzaSyB1rCPA3zK4HbBJs5NbcdKq-_-fIixKZiw'
-GOOGLE_CLIENT_SECRET_FILE = 'C:/Users/ashwi/Documents/studyswift_app/credentials.json'
-GOOGLE_REDIRECT_URI = 'https://127.0.0.1:8000/oauth2callback'
-
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -64,7 +56,7 @@ INSTALLED_APPS = [
     "allauth",
     "allauth.account",
     "allauth.socialaccount",
-    "allauth.socialaccount.providers.github",
+    "allauth.socialaccount.providers.google",
     "studyswift",
     'crispy_forms',
     "crispy_bootstrap4",
@@ -110,10 +102,10 @@ TEMPLATES = [
 ]
 
 SOCIALACCOUNT_PROVIDERS = {
-    'github': {
+    'google': {
         'APP': {
-            'client_id': 'd91699f946106930e935',
-            'secret': '886853cba2f6fe96a4fcaa5545b7f2c2d9507ef3',
+            'client_id': '387581262920-s4b426rrivpvcpu0lg4l5l6arflgfe7o.apps.googleusercontent.com',
+            'secret': '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',
             'key': ''
         }
     }

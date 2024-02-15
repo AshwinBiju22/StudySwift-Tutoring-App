@@ -44,7 +44,9 @@ urlpatterns = [
     path('delete-message/<int:message_id>/', views.delete_message, name='delete_message'),
     path('clear-chat/<int:recipient_id>/', views.clear_chat, name='clear_chat'),
 
-    path('calendar/', views.calendar_view, name='calendar_view'),
+    path('calendar_view/', views.calendar_view, name='calendar_view'),
+    path('add_event/', views.add_event, name='add_event'),
+    path('delete_event/<int:event_id>/', views.delete_event, name='delete_event'),
 
     path('studybot/', views.bot, name='studybot'),
 

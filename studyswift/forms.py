@@ -1,6 +1,6 @@
 from allauth.account.forms import SignupForm
 from django import forms
-from .models import UserProfile, Flashcard, SchoolClass, Homework, HomeworkSubmission, Message
+from .models import UserProfile, Flashcard, SchoolClass, Homework, HomeworkSubmission, Message, Event
 from django.contrib.auth.models import User
 from multiupload.fields import MultiFileField
 
@@ -79,3 +79,13 @@ class MessageForm(forms.ModelForm):
     class Meta:
         model = Message
         fields = ['content']
+
+
+class EventForm(forms.ModelForm):
+    class Meta:
+        model = Event
+        fields = ['title', 'start_datetime', 'end_datetime']
+        widgets = {
+            'start_datetime': forms.DateTimeInput(attrs={'type': 'datetime-local'}),
+            'end_datetime': forms.DateTimeInput(attrs={'type': 'datetime-local'}),
+        }
