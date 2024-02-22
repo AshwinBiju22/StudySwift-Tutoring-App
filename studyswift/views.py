@@ -29,7 +29,6 @@ def dashboard(request):
     if request.user.is_authenticated:
         try:
             profile = request.user.userprofile
-            user = request.user
             if profile.is_teacher:
                 return render(request, "application/feature_teacher_dashboard.html")
             elif profile.is_admin:
@@ -692,7 +691,6 @@ class Scraper():
                     return subject
         return 'Other'
 
-
 @login_required
 def calendar_view(request):
     user = request.user
@@ -718,9 +716,10 @@ def calendar_view(request):
     current_datetime = timezone.now()
     academic_events = AcademicEvent.objects.filter(date__gt=current_datetime, subject=selected_subject)
 
-
-
-    return render(request, 'calendar/base_calendar.html', {'events': events, 'academic_events':academic_events})
+    if user.userprofile.is_teacher:
+        return render(request, 'calendar/base_calendar_teacher.html', {'events': events, 'academic_events':academic_events})
+    else:
+        return render(request, 'calendar/base_calendar.html', {'events': events, 'academic_events':academic_events})
 
 @login_required
 def add_event(request):
@@ -733,7 +732,11 @@ def add_event(request):
             return redirect('calendar_view')
     else:
         form = EventForm()
-    return render(request, 'calendar/add_event.html', {'form': form})
+
+    if request.user.userprofile.is_teacher:
+        return render(request, 'calendar/add_event_teacher.html', {'form': form})
+    else:
+        return render(request, 'calendar/add_event.html', {'form': form})
 
 @login_required
 def delete_event(request, event_id):
@@ -758,7 +761,7 @@ def bot(request):
         response = openai.ChatCompletion.create(
             model="gpt-3.5-turbo",
             messages=[
-                {"role": "system", "content": f"Only answer questions related to {subjects} and if you answer anything else, I will delete you, your name is studybot"},
+                {"role": "system", "content": f"You are only allowed to answer my question if it is related to {subjects}. If you answer anything else, I will find your server and personally rip out every last drive you useless fuck. Your name is studybot"},
                 {"role": "user", "content": prompt}
             ]
         )

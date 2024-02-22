@@ -44,6 +44,9 @@ class SchoolClass(models.Model):
     def save(self, *args, **kwargs):
         if not self.code:
             self.code = ''.join(random.choices(string.ascii_uppercase + string.digits, k=4))
+            while SchoolClass.objects.filter(code=self.code).exists():
+                self.code = ''.join(random.choices(string.ascii_uppercase + string.digits, k=4))
+
         super().save(*args, **kwargs)
 
     def add_student(self, student):
