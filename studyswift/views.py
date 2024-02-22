@@ -295,25 +295,20 @@ def test_flashcard(request, flashcard_ids):
     score = None
 
     if request.method == "POST":
-        # Ensure that the button name is 'check'
         if 'check' in request.POST:
-            # Initialize variables for scoring
             total_questions = len(flashcards)
             correct_answers = 0
 
-            # Iterate through each flashcard and check the entered answer
             for flashcard in flashcards:
                 flashcard_id_str = str(flashcard.id)
                 entered_answer = request.POST.get(f'answer_{flashcard_id_str}')
 
-                # Compare the entered answer with the actual answer
                 if entered_answer is not None and entered_answer.lower() == flashcard.answer.lower():
                     flashcard.correct = True
                     correct_answers += 1
                 else:
                     flashcard.correct = False
 
-            # Calculate the score
             score = f"{correct_answers}/{total_questions}"
 
     return render(request, 'flashcards/test_flashcard.html', {'flashcards': flashcards, 'score': score})
@@ -359,7 +354,7 @@ def create_homework(request):
             homework.save_to_google_calendar()
             messages.success(request, 'Homework created successfully!')
 
-            return redirect('manage_homework')  # Redirect to a view displaying all homework assignments
+            return redirect('manage_homework') 
     else:
         form = HomeworkForm()
 
@@ -488,22 +483,18 @@ def update_profile(request):
     
 ###-------------------------------MESSAGING SYSTEM-------------------------------###
 def filter_inappropriate_content(message_content):
-    # Define a list of inappropriate words or patterns
     inappropriate_patterns = [
         r'\bshit\b',
         r'\bfuck\b',
-        # Add more patterns as needed
     ]
 
-    # Compile regular expressions
     regex_patterns = [re.compile(pattern, re.IGNORECASE) for pattern in inappropriate_patterns]
 
-    # Check if the message contains any inappropriate content
     for regex_pattern in regex_patterns:
         if regex_pattern.search(message_content):
-            return True  # Inappropriate content found
+            return True  
 
-    return False  # No inappropriate content found
+    return False  
 
 @login_required
 def send_message(request, recipient_id):
@@ -531,7 +522,6 @@ def send_message(request, recipient_id):
         (models.Q(sender=request.user, recipient=recipient) | models.Q(sender=recipient, recipient=request.user))
     ).order_by('timestamp')
 
-    # Identify messages sent within the last 3 hours
     for message in allmessages:
         time_difference = timezone.now() - message.timestamp
         message.editable = time_difference.total_seconds() <= 3 * 60 * 60
@@ -581,7 +571,6 @@ def delete_message(request, message_id):
 
 @login_required
 def clear_chat(request, recipient_id):
-    # Assuming you have a model named `Message` with fields 'sender', 'recipient', and 'content'
     messages_to_clear = Message.objects.filter(
         (models.Q(sender=request.user, recipient=recipient_id) | models.Q(sender=recipient_id, recipient=request.user))
     )
@@ -594,13 +583,11 @@ def clear_chat(request, recipient_id):
 @login_required
 def inbox(request):
     if request.user.userprofile.is_teacher:
-        # If the user is a teacher, allow messaging all teachers and only students in their classes
         recipients = User.objects.filter(
             Q(userprofile__is_teacher=True) | 
             Q(userprofile__is_teacher=False, classes_enrolled__in=request.user.classes_taught.all())
         ).exclude(id=request.user.id)
     else:
-        # If the user is a student, allow messaging their teachers and only students in their classes
         recipients = User.objects.filter(
             Q(userprofile__is_teacher=True, classes_taught__in=request.user.classes_enrolled.all()) |
             Q(userprofile__is_teacher=False, classes_enrolled__in=request.user.classes_enrolled.all())
@@ -648,7 +635,6 @@ class Scraper():
         if response.status_code == 200:
             rows = response.html.find('div.topic-detail-page div.services-country-grids div.col-sm-9')
             for row in rows:
-                # Extract data from each table cell in the row
                 cells = row.find('td')
 
                 conference_list = []
@@ -669,22 +655,17 @@ class Scraper():
             return None
         
     def format_date(self, date_str):
-        # Split the date string into day and month parts
         day, month = date_str.split()
-        # Assuming the current year is 2024
         year = '2024'
-        # Map month abbreviation to its numeric representation
         month_map = {
             'Jan': '01', 'Feb': '02', 'Mar': '03', 'Apr': '04',
             'May': '05', 'Jun': '06', 'Jul': '07', 'Aug': '08',
             'Sep': '09', 'Oct': '10', 'Nov': '11', 'Dec': '12'
         }
-        # Format the date string
         formatted_date_str = f"{year}-{month_map[month]}-{day}"
         return formatted_date_str
     
     def get_subject(self, title):
-        # Iterate through the subject mapping and check if any keyword matches the conference title
         for subject, keywords in self.SUBJECT_MAPPING.items():
             for keyword in keywords:
                 if keyword.lower() in title.lower():
