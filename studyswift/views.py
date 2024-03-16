@@ -1,7 +1,7 @@
 from django.shortcuts import get_object_or_404, redirect, render
 from allauth.account.views import SignupView
-from .forms import CustomSignupForm, FlashcardForm, SchoolClassForm, JoinClassForm, UserProfileUpdateForm, HomeworkForm, HomeworkCompletionForm, MessageForm, EventForm#, HomeworkSubmissionForm
-from .models import Flashcard, UserProfile, SchoolClass, Reward, Homework, HomeworkFile, Message, Event, AcademicEvent#, HomeworkSubmission
+from .forms import CustomSignupForm, FlashcardForm, SchoolClassForm, JoinClassForm, UserProfileUpdateForm, HomeworkForm, HomeworkCompletionForm, MessageForm, EventForm
+from .models import Flashcard, RewardPurchase, UserProfile, SchoolClass, Reward, Homework, HomeworkFile, Message, Event, AcademicEvent, HomeworkSubmission
 from django.db.models import Count, Sum
 from django.contrib import messages
 from django.contrib.auth.models import User
@@ -211,13 +211,17 @@ def rewards_view(request):
     rewards = Reward.objects.all()
     user_profile = UserProfile.objects.get(user=request.user)
     locker_rewards = user_profile.rewards.all()
-
+    reward_quantity_list = []
+    for item in locker_rewards:
+        reward = RewardPurchase.objects.get(student=student, reward=item)
+        reward_quantity_list.append(reward)
+    
     return render(request, "rewards/rewards.html", {
         'good_points': good_points,
         'bad_points': bad_points,
         'rewards': rewards,
         'user_profile': user_profile,
-        'locker_rewards': locker_rewards,
+        'reward_quantity_list': reward_quantity_list,
     })
 
 @login_required
@@ -229,6 +233,13 @@ def purchase_reward(request, reward_id):
         user_profile.good_points -= reward.cost
         user_profile.rewards.add(reward)
         user_profile.save()
+
+        purchase, created = RewardPurchase.objects.get_or_create(student=request.user, reward=reward)
+
+        # If the purchase already exists, increase the quantity
+        if not created:
+            purchase.quantity += 1
+            purchase.save()
 
         messages.success(request, f"You've successfully purchased {reward.name}!")
     else:
@@ -351,7 +362,6 @@ def create_homework(request):
 
             form.save_m2m() 
 
-            homework.save_to_google_calendar()
             messages.success(request, 'Homework created successfully!')
 
             return redirect('manage_homework') 
@@ -407,54 +417,42 @@ def delete_homework(request, homework_id):
 def view_homework(request, homework_id):
     homework = get_object_or_404(Homework, id=homework_id)
     teacher_files = homework.files.all()
-
-    #submission = homework.submissions.filter(student=request.user).first()
+    student_submission = request.user.student_submissions.filter(homework=homework).first()
 
     if request.method == 'POST':
-        completion_form = HomeworkCompletionForm(request.POST, instance=request.user.student_submissions.filter(homework=homework).first())
+        completion_form = HomeworkCompletionForm(request.POST, request.FILES, instance=student_submission)
+        
         if completion_form.is_valid():
             submission = completion_form.save(commit=False)
             submission.homework = homework
             submission.student = request.user
             submission.save()
+
+            for file in request.FILES.getlist('files'):
+                homework_file = HomeworkFile.objects.create(studentfile=file)
+                submission.files.add(homework_file)
+            
             messages.success(request, 'Homework marked as completed.')
             return redirect('view_homework', homework_id=homework_id)
     else:
-        completion_form = HomeworkCompletionForm(instance=request.user.student_submissions.filter(homework=homework).first())
+        completion_form = HomeworkCompletionForm(instance=student_submission)
 
-    #student_files = HomeworkSubmission.objects.filter(homework=homework, student=request.user)
-
-    #if request.method == 'POST':
-        #form = HomeworkSubmissionForm(request.POST, request.FILES, instance=homework)
-        #if form.is_valid():
-         #   new_submission = form.save(commit=False)
-          #  new_submission.user = request.user
-           # new_submission.homework = homework
-
-            #if 'files' in request.FILES:
-             #   for file in request.FILES.getlist('files'):
-              #      new_file = HomeworkSubmission(file=file)
-               #     new_file.save()
-                #    new_submission.files.add(new_file)
-            
-            #new_submission.save()            
-            #form.save_m2m()
-        
-        #completion = HomeworkCompletionForm(request.POST)
-        #if completion.is_valid():
-         #   completion.save()
-
-          #  messages.success(request, 'Homework submitted successfully!')
-           # return redirect('manage_homework')
-    #else:
-     #   form = HomeworkSubmissionForm(instance=homework)
-        
     return render(request, 'homework/view_homework.html', {
         'homework': homework,
         'teacher_files': teacher_files,
         'completion_form': completion_form,
+        'student_submission': student_submission,
     })
 
+@login_required
+def view_submissions(request, homework_id):
+    homework = get_object_or_404(Homework, id=homework_id)
+    submissions = HomeworkSubmission.objects.filter(homework=homework)
+
+    return render(request, 'homework/view_submissions.html', {
+        'homework': homework,
+        'submissions': submissions,
+    })
 ###-------------------------------SETTINGS/PROFILE-------------------------------###
 def update_profile(request):
     if request.method == 'POST':
@@ -677,7 +675,7 @@ def calendar_view(request):
     user = request.user
 
     scraper = Scraper()
-    table_data = scraper.scrapedata(tag='2')
+    table_data = scraper.scrapedata(tag='3')
     if table_data:
         for conference in table_data:
             date = conference[0]

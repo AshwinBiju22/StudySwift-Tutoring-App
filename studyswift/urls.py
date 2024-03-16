@@ -36,6 +36,7 @@ urlpatterns = [
     path('delete_homework/<int:homework_id>/', views.delete_homework, name='delete_homework'),
     path('remove_file/<int:file_id>/<int:homework_id>/', views.remove_file, name='remove_file'),
     path('view_homework/<int:homework_id>/', views.view_homework, name='view_homework'),
+    path('view_submissions/<int:homework_id>/', views.view_submissions, name='view_submissions'),
     path('class_leaderboard/<int:class_id>/', views.class_leaderboard, name='class_leaderboard'),
 
     path('send_message/<int:recipient_id>/', views.send_message, name='send_message'),

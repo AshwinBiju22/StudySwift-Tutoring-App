@@ -54,6 +54,8 @@ class HomeworkForm(forms.ModelForm):
         self.fields['files'].required = False
 
 class HomeworkCompletionForm(forms.ModelForm):
+    files = MultiFileField(min_num=0, max_num=5, max_file_size=1024 * 1024 * 5, required=False)
+
     class Meta:
         model = HomeworkSubmission
         fields = ['completed']
@@ -63,23 +65,10 @@ class HomeworkCompletionForm(forms.ModelForm):
 
         self.fields['completed'].required = False
 
-#class HomeworkSubmissionForm(forms.ModelForm):
- #   files = MultiFileField(min_num=1, max_num=5, max_file_size=1024 * 1024 * 5)
-
-#    class Meta:
- #       model = Homework
-  #      fields = ['submissions']
-
-    #def __init__(self, *args, **kwargs):
-    #    super().__init__(*args, **kwargs)
-
-     #   self.fields['submissions'].required = False
-        
 class MessageForm(forms.ModelForm):
     class Meta:
         model = Message
         fields = ['content']
-
 
 class EventForm(forms.ModelForm):
     class Meta:

@@ -120,10 +120,10 @@
 
     <div class="grid-item">
       <h2>Your Locker</h2>
-      {% if locker_rewards %}
+      {% if reward_quantity_list %}
         <ul class="reward-list">
-          {% for reward in locker_rewards %}
-            <li>{{ reward.name }}</li>
+          {% for reward in reward_quantity_list %}
+            <li>{{ reward.reward }} x {{ reward.quantity }}</li>
           {% endfor %}
         </ul>
       {% else %}

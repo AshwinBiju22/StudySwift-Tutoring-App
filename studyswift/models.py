@@ -13,7 +13,12 @@ class Reward(models.Model):
 
     def __str__(self):
         return self.name
-    
+
+class RewardPurchase(models.Model):
+    student = models.ForeignKey(User, on_delete=models.CASCADE)
+    reward = models.ForeignKey(Reward, on_delete=models.CASCADE)
+    quantity = models.IntegerField(default=1)
+
 class UserProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='userprofile')
     is_teacher = models.BooleanField(default=False)
@@ -63,13 +68,18 @@ class SchoolClass(models.Model):
 
 class HomeworkFile(models.Model):
     file = models.FileField(upload_to='teacher_uploads/', null=True, blank=True)
+    studentfile = models.FileField(upload_to='student_uploads/', null=True, blank=True)
 
     def delete(self, *args, **kwargs):
-        # Delete the file from the storage when the HomeworkFile is deleted
         if self.file:
             file_path = os.path.join(settings.MEDIA_ROOT, str(self.file))
             if os.path.exists(file_path):
                 os.remove(file_path)
+        if self.studentfile:
+            file_path = os.path.join(settings.MEDIA_ROOT, str(self.studentfile))
+            if os.path.exists(file_path):
+                os.remove(file_path)
+
         super().delete(*args, **kwargs)
         
     def __str__(self):
@@ -84,32 +94,27 @@ class Homework(models.Model):
     files = models.ManyToManyField(HomeworkFile, related_name='homework_files', blank=True)
     students = models.ManyToManyField(User, through='HomeworkSubmission', related_name='homeworks')
 
+    def save(self, *args, **kwargs):
+        if not self.id:
+            self.due_date = timezone.now() + timedelta(days=7)
+        super().save(*args, **kwargs)
 
     def delete(self, *args, **kwargs):
-        # Delete associated files when the Homework is deleted
         for file_obj in self.files.all():
             file_obj.delete()
-
         super().delete(*args, **kwargs)
 
 class HomeworkSubmission(models.Model):
     completed = models.BooleanField(default=False)
     student = models.ForeignKey(User, on_delete=models.CASCADE, related_name='student_submissions')
     homework = models.ForeignKey(Homework, on_delete=models.CASCADE, related_name='submissions')
-
-    #file = models.FileField(upload_to='student_uploads/', null=True, blank=True)
-
-    #def delete(self, *args, **kwargs):
-        # Delete the file from the storage when the HomeworkFile is deleted
-     #   if self.file:
-      #      file_path = os.path.join(settings.MEDIA_ROOT, str(self.file))
-       #     if os.path.exists(file_path):
-        #        os.remove(file_path)
-        #super().delete(*args, **kwargs)
-        
-    #def __str__(self):
-     #   return str(self.file)
+    files = models.ManyToManyField(HomeworkFile, related_name='submission_files', blank=True)
     
+    def delete(self, *args, **kwargs):
+        for file_obj in self.files.all():
+            file_obj.delete()
+        super().delete(*args, **kwargs)
+
 class Message(models.Model):
     sender = models.ForeignKey(User, related_name='sender', on_delete=models.CASCADE)
     recipient = models.ForeignKey(User, related_name='recipient', on_delete=models.CASCADE)

@@ -13,6 +13,10 @@ class UserAdmin(BaseUserAdmin):
 admin.site.unregister(User)
 admin.site.register(User, UserAdmin)
 
+@admin.register(UserProfile)
+class UserProfileAdmin(admin.ModelAdmin):
+    list_display = ('user', 'good_points', 'bad_points') 
+
 @admin.register(SchoolClass)
 class SchoolClassAdmin(admin.ModelAdmin):
     list_display = ('name', 'code', 'teacher') 
@@ -29,6 +33,12 @@ class RewardAdmin(admin.ModelAdmin):
     list_display = ('cost', 'name')
     search_fields = ('name', 'cost')
     ordering = ('cost',)
+
+@admin.register(RewardPurchase)
+class RewardPurchaseAdmin(admin.ModelAdmin):
+    list_display = ('student', 'reward', 'quantity')
+    search_fields = ('student', 'reward')
+    #ordering = ('cost',)
 
 @admin.register(Homework)
 class HomeworkAdmin(admin.ModelAdmin):

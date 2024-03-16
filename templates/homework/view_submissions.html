@@ -1,0 +1,38 @@
+{% extends 'application/teacher_dashboard.html' %}
+
+{% block content %}
+
+  <h1>View Submissions for Homework: {{ homework.title }}</h1>
+  <h3>Description:</h3>
+  <p>{{ homework.description }}</p>
+  <h3>Due Date:</h3>
+  <p>{{ homework.due_date }}</p>
+  <h3>Class:</h3>
+  <p>{{ homework.assigned_class }}</p>
+
+  <h2>Student Submissions</h2>
+  {% if submissions %}
+    <ul>
+    {% for submission in submissions %}
+      <li>
+        <strong>Student:</strong> {{ submission.student.username }}<br>
+        {% if submission.files.all %}
+          <strong>Files:</strong>
+          <ul>
+          {% for file in submission.files.all %}
+            <li><a href="{{ file.studentfile.url }}" download>{{ file.studentfile.name }}</a></li>
+          {% endfor %}
+          </ul>
+        {% else %}
+          <p>No files uploaded.</p>
+        {% endif %}
+      </li>
+    {% endfor %}
+    </ul>
+  {% else %}
+    <p>No submissions yet.</p>
+  {% endif %}
+
+  <a href="{% url 'manage_homework' %}">Manage Homework</a>
+
+{% endblock %}
