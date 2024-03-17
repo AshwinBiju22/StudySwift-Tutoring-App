@@ -56,6 +56,8 @@ urlpatterns = [
     path('create_questions/<int:exam_id>/', views.create_questions, name='create_questions'),
     path('take_exam/<int:exam_id>/', views.take_exam, name='take_exam'),
     path('view_exam_submissions/<int:exam_id>/', views.view_exam_submissions, name='view_exam_submissions'),
+    path('exam_results/<str:student_username>/', views.exam_results, name='exam_results'),
+
 
     path('update-profile/', views.update_profile, name='update_profile'),
 

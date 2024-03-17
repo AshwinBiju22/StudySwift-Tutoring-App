@@ -1,0 +1,69 @@
+{% extends 'application/teacher_dashboard.html' %}
+
+{% block content %}
+
+  <h1>Exam Results</h1>
+  
+  <canvas id="examScoresChart" width="400" height="200"></canvas>
+
+  <a href="{% url 'base_class' %}" class="nav__link">
+    <i class='bx bx-edit-alt'></i>
+    <span class="nav__name">Back to Classes</span>
+  </a>
+
+  <script>
+      var examTitles = {{ exam_titles|safe }};
+      var scores = {{ percentage_list|safe }};
+
+      var chartData = {
+          labels: examTitles,
+          datasets: [{
+              label: 'Student Exam Scores',
+              data: scores,
+              borderColor: 'rgba(0, 123, 255, 1)', // Light orange border color
+              backgroundColor: 'rgba(0, 123, 255, 0.2)', // Light orange background color with transparency
+              borderWidth: 1
+          }]
+      };
+
+      // Render chart
+      var ctx = document.getElementById('examScoresChart').getContext('2d');
+      var myChart = new Chart(ctx, {
+          type: 'line',
+          data: chartData,
+          options: {
+              scales: {
+                  y: {
+                      beginAtZero: true,
+                      title: {
+                          display: true,
+                          text: 'Percentage Score',
+                          color: 'rgba(255, 255, 255, 1)' // Light color for axis label
+                      },
+                      grid: {
+                          color: 'rgba(255, 255, 255, 0.2)' // Light color for grid lines
+                      },
+                      ticks: {
+                          color: 'rgba(255, 255, 255, 1)' // Light color for tick marks
+                      }
+                  },
+                  x: {
+                      title: {
+                          display: true,
+                          text: 'Exam Title',
+                          color: 'rgba(255, 255, 255, 1)' // Light color for axis label
+                      },
+                      grid: {
+                          color: 'rgba(255, 255, 255, 0.2)' // Light color for grid lines
+                      },
+                      ticks: {
+                          color: 'rgba(255, 255, 255, 1)' // Light color for tick marks
+                      }
+                  }
+              }
+          }
+      });
+  </script>
+
+{% endblock %}
+

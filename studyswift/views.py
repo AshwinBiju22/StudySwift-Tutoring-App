@@ -850,4 +850,32 @@ def view_exam_submissions(request, exam_id):
     submissions = ExamSubmission.objects.filter(exam=exam).select_related('student')
     return render(request, "exam/view_exam_submissions.html", {'exam': exam, 'submissions': submissions})
 
+def exam_results(request, student_username):
+    student = User.objects.get(username=student_username)
+    exams = ExamSubmission.objects.filter(student=student).all()
+
+    percentage_list = []
+    exam_titles = []
+    for exam in exams:
+
+        exam_title = exam.exam.title
+        exam_titles.append(exam_title)
+
+        total_score = (Exam.objects.get(title=exam_title)).marks
+        score = exam.score
+        percentage = round((score/total_score)*100)
+        percentage_list.append(percentage)
+    
+    print(exam_titles, percentage_list)
+
+    context = {
+        'exam_titles': exam_titles,
+        'percentage_list': percentage_list,
+    }
+
+    return render(request, "exam/exam_results.html", context)
+
+
+
+
 
