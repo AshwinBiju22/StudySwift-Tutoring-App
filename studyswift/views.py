@@ -12,7 +12,6 @@ import re
 import openai
 from django.db.models import Q
 from requests_html import HTMLSession
-from datetime import datetime
 
 
 # PATH OF APP DIRECTORY C:\Users\ashwi\Documents\studyswift_app\studyswift\
@@ -30,7 +29,10 @@ def dashboard(request):
         try:
             profile = request.user.userprofile
             if profile.is_teacher:
-                return render(request, "application/feature_teacher_dashboard.html")
+                classes = request.user.classes_taught.all()
+                return render(request, "application/feature_teacher_dashboard.html", {
+                    'classes': classes
+                })
             elif profile.is_admin:
                 return render(request, "application/admin_dashboard.html")
             else:
@@ -44,10 +46,27 @@ def dashboard(request):
                 user_profile = UserProfile.objects.get(user=request.user)
                 locker_rewards = user_profile.rewards.all()
 
+                #----------------Exam Results Line Chart-------------------------#
+                exams = ExamSubmission.objects.filter(student=student).all()
+
+                percentage_list = []
+                exam_titles = []
+                for exam in exams:
+
+                    exam_title = exam.exam.title
+                    exam_titles.append(exam_title)
+
+                    total_score = (Exam.objects.get(title=exam_title)).marks
+                    score = exam.score
+                    percentage = round((score/total_score)*100)
+                    percentage_list.append(percentage)
+
                 return render(request, "application/feature_dashboard.html", {
                         'good_points': good_points,
                         'bad_points': bad_points,
                         'locker_rewards': locker_rewards,
+                        'exam_titles': exam_titles,
+                        'percentage_list': percentage_list,
                     })
         except UserProfile.DoesNotExist:
             return render(request, "application/feature_dashboard.html")
@@ -631,7 +650,8 @@ class Scraper():
         print(response.status_code)
 
         if response.status_code == 200:
-            rows = response.html.find('div.topic-detail-page div.services-country-grids div.col-sm-9')
+            rows = response.html.find('div.services-country-grids div.col-sm-9')
+            print(rows)
             for row in rows:
                 cells = row.find('td')
 
@@ -646,7 +666,7 @@ class Scraper():
 
                     temp = [conference_date, conference_title, conference_location, conference_subject]
                     conference_list.append(temp) 
-
+                
             return conference_list
         else:
             print("Failed to fetch data.")
@@ -675,7 +695,7 @@ def calendar_view(request):
     user = request.user
 
     scraper = Scraper()
-    table_data = scraper.scrapedata(tag='3')
+    table_data = scraper.scrapedata(tag='2')
     if table_data:
         for conference in table_data:
             date = conference[0]
@@ -772,7 +792,12 @@ def base_exam(request):
                         exam_score = exam.examsubmission_set.filter(student=request.user)
                     else:
                         exams_without_submissions.append(exam)
-            return render(request, "exam/base_exam_student.html", {'exams_with_submissions': exams_with_submissions, 'exam_score': exam_score,'exams_without_submissions': exams_without_submissions})
+            
+            if len(exams_without_submissions) > 0:
+                exam_without_submissions_exists = True
+            else:
+                exam_without_submissions_exists = False
+            return render(request, "exam/base_exam_student.html", {'exams_with_submissions': exams_with_submissions, 'exam_score': exam_score,'exams_without_submissions': exams_without_submissions, 'exam_without_submissions_exists': exam_without_submissions_exists})
 
 @login_required
 def create_exam(request):
@@ -856,6 +881,7 @@ def view_exam_submissions(request, exam_id):
     submissions = ExamSubmission.objects.filter(exam=exam).select_related('student')
     return render(request, "exam/view_exam_submissions.html", {'exam': exam, 'submissions': submissions})
 
+@login_required
 def exam_results(request, student_username):
     student = User.objects.get(username=student_username)
     exams = ExamSubmission.objects.filter(student=student).all()
@@ -872,8 +898,6 @@ def exam_results(request, student_username):
         percentage = round((score/total_score)*100)
         percentage_list.append(percentage)
     
-    print(exam_titles, percentage_list)
-
     context = {
         'exam_titles': exam_titles,
         'percentage_list': percentage_list,

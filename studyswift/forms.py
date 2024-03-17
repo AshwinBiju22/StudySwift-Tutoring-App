@@ -93,14 +93,9 @@ class QuestionForm(forms.Form):
     answer = forms.ChoiceField(choices=[('1', 'Option 1'), ('2', 'Option 2'), ('3', 'Option 3'), ('4', 'Option 4')])
     marks = forms.IntegerField(min_value=1)
 
-class ExamSubmissionForm(forms.ModelForm):
-    class Meta:
-        model = ExamSubmission
-        fields = []
-
 class StudentAnswerForm(forms.ModelForm):
     answer = forms.ChoiceField(choices=[('1', 'Option 1'), ('2', 'Option 2'), ('3', 'Option 3'), ('4', 'Option 4')], widget=forms.RadioSelect)
-    
+
     class Meta:
         model = StudentAnswer
         fields = ['answer']

@@ -4,7 +4,7 @@
   <h1>Exam Dashboard</h1>
 
   <h4>Pending Exams</h4>
-  {% if exam_without_submissions %}
+  {% if exam_without_submissions_exists %}
     {% for exam in exams_without_submissions %}
       Title: {{ exam.title }} | Questions: {{ exam.num_questions }} <br>
       <a href="{% url 'take_exam' exam.id %}" class="nav__link">
@@ -25,6 +25,11 @@
     {% endfor %}
     <br>
   {% endfor %}
+
+  <a href="{% url 'manage_homework' %}" class="nav__link">
+    <i class='bx bx-edit-alt'></i>
+    <span class="nav__name">Back to Homeworks</span>
+  </a>
 
   
 {% endblock %}

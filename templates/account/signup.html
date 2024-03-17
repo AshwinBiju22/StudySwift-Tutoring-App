@@ -1,6 +1,7 @@
 {% load static %}
 {% load allauth i18n socialaccount %}
 {% load crispy_forms_tags %}
+{% include "messages.html" %}
 
 <!DOCTYPE html>
 <html lang="en">
@@ -76,9 +77,6 @@
 
             <button type="submit" class="btn btn-primary">Sign Up</button>
         </form>
-
-        <p>Or</p>
-        <a href="{% provider_login_url 'google' %}">Sign up with Google</a>
 
         <hr>
 

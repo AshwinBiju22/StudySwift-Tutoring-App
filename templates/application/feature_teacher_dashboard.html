@@ -2,9 +2,27 @@
 
 {% block content %}
 
+  <style>
+    .class-container {
+        margin-bottom: 20px;
+        margin-right: 300px;
+        border: 1px solid #ddd;
+        padding: 10px;
+        border-radius: 5px;
+    }
+
+    .class-header {
+        font-size: 20px;
+        font-weight: bold;
+    }
+
+    .teacher-student-list {
+        padding-left: 20px;
+    }
+</style>
+
   <h1>Dashboard</h1>
   {% include "messages.html" %}
-
 
     <!-- User Profile Section -->
     <div class="dashboard-card">
@@ -22,6 +40,37 @@
         </div>
       </div>
     </div>
+
+    <div class="dashboard-card-blue">
+      <h2 class="black-colour">Welcome {{ user.username }}!</h2>
+      <div class="profile-section">
+        <div class="greeting-message">
+          <p>
+            Below are your classes:
+          </p>
+
+          <div class="row">
+            {% for school_class in classes %}
+            <div class="col-md-6">
+                  <div class="teacher-student-list">
+                      <p>Class Name: {{school_class.name}}</p>
+                      <p>Students:</p>
+                      <ul>
+                          {% for student in school_class.students.all %}
+                              <li>{{ student.username }}</li>
+                          {% endfor %}
+                      </ul>
+                  </div>
+            </div>
+            {% endfor %}
+        </div>
+
+
+        </div>
+      </div>
+    </div>
+
+
   </div>
 
 {% endblock %}
@@ -40,12 +89,22 @@
     }
 
     .dashboard-card {
-      width: 30%; /* Adjust the width as needed */
+      width: 45%;
       margin: 20px;
       padding: 20px;
-      float: right;
+      float: left;
       border-radius: 8px;
       background-color: #c21e1b;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .dashboard-card-blue {
+      width: 45%;
+      margin: 20px;
+      padding: 20px;
+      float: left;
+      border-radius: 8px;
+      background-color: #2a75a4;
       box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     }
 
