@@ -1,7 +1,7 @@
 from django.shortcuts import get_object_or_404, redirect, render
 from allauth.account.views import SignupView
-from .forms import CustomSignupForm, FlashcardForm, SchoolClassForm, JoinClassForm, UserProfileUpdateForm, HomeworkForm, HomeworkCompletionForm, MessageForm, EventForm
-from .models import Flashcard, RewardPurchase, UserProfile, SchoolClass, Reward, Homework, HomeworkFile, Message, Event, AcademicEvent, HomeworkSubmission
+from .forms import CustomSignupForm, FlashcardForm, SchoolClassForm, JoinClassForm, StudentAnswerForm, UserProfileUpdateForm, HomeworkForm, HomeworkCompletionForm, MessageForm, EventForm, QuestionForm, ExamForm
+from .models import ExamSubmission, Flashcard, RewardPurchase, StudentAnswer, UserProfile, SchoolClass, Reward, Homework, HomeworkFile, Message, Event, AcademicEvent, HomeworkSubmission, Exam, Question
 from django.db.models import Count, Sum
 from django.contrib import messages
 from django.contrib.auth.models import User
@@ -751,9 +751,103 @@ def bot(request):
 
     return render(request, 'bot/bot.html')
 
+###-------------------------------EXAMS/TEST-------------------------------###
 
+@login_required
+def base_exam(request):
+    if request.user.is_authenticated:
+        profile = request.user.userprofile
+        if profile.is_teacher:
+            exams = Exam.objects.filter(teacher=request.user)
+            return render(request, "exam/base_exam_teacher.html", {'exams': exams})
+        else:
+            classes = request.user.classes_enrolled.all()
+            exams = []
+            for each_class in classes:
+                exam = Exam.objects.filter(assigned_class=each_class).all()
+                exams.append(exam)
+            return render(request, "exam/base_exam_student.html", {'exams': exams})
 
+@login_required
+def create_exam(request):
+    if request.method == 'POST':
+        exam_form = ExamForm(request.POST)
+        if exam_form.is_valid():
+            title = exam_form.cleaned_data['title']
+            assigned_class = exam_form.cleaned_data['assigned_class']
+            num_questions = exam_form.cleaned_data['num_questions']
+            
+            exam = Exam.objects.create(title=title, assigned_class=assigned_class, teacher=request.user, num_questions=num_questions)
 
+            
+            return redirect('create_questions', exam_id=exam.id)
+    else:
+        exam_form = ExamForm()
+    
+    return render(request, 'exam/create_exam.html', {'exam_form': exam_form})
 
+@login_required
+def create_questions(request, exam_id):
+    exam = Exam.objects.get(pk=exam_id)
+    if request.method == 'POST':
+        question_forms = [QuestionForm(request.POST, prefix=str(i)) for i in range(exam.num_questions)]
+        if all(form.is_valid() for form in question_forms):
+            total_marks = 0
+            for form in question_forms:
+                total_marks += form.cleaned_data['marks']
+                question = Question(
+                    exam=exam,
+                    question=form.cleaned_data['question'],
+                    op1=form.cleaned_data['op1'],
+                    op2=form.cleaned_data['op2'],
+                    op3=form.cleaned_data['op3'],
+                    op4=form.cleaned_data['op4'],
+                    answer=form.cleaned_data['answer'],
+                    marks=form.cleaned_data['marks']
+                )
+                question.save()
+            exam.marks = total_marks
+            exam.save()
+            return redirect('base_exam')
+    else:
+        question_forms = [QuestionForm(prefix=str(i)) for i in range(exam.num_questions)]
+    
+    return render(request, 'exam/create_questions.html', {'question_forms': question_forms})
+
+@login_required
+def take_exam(request, exam_id):
+    exam = Exam.objects.get(pk=exam_id)
+    question_list = Question.objects.filter(exam=exam).all()
+    submission, created = ExamSubmission.objects.get_or_create(student=request.user, exam=exam)
+
+    if request.method == 'POST':
+        answer_forms = [StudentAnswerForm(request.POST, prefix=str(question.id), instance=StudentAnswer(question=question)) for question in question_list]
+        if all(form.is_valid() for form in answer_forms):
+            for form in answer_forms:
+                form.instance.submission = submission
+                form.instance.is_correct = form.instance.answer == form.instance.question.answer
+                form.save()
+            
+            submission.score = calculate_score(submission)
+            submission.save()
+            return redirect('base_exam')
+
+    else:
+        answer_forms = [StudentAnswerForm(prefix=str(question.id), instance=StudentAnswer(question=question)) for question in question_list]
+
+    return render(request, "exam/take_exam.html", {'exam': exam, 'question_list': zip(question_list, answer_forms)})
+
+def calculate_score(submission):
+    total_score = 0
+    for student_answer in submission.studentanswer_set.all():
+        if student_answer.is_correct:
+            total_score += student_answer.question.marks
+    return total_score
+
+@login_required
+def view_exam_submissions(request, exam_id):
+    exam = Exam.objects.get(pk=exam_id)
+    submissions = ExamSubmission.objects.filter(exam=exam).select_related('student')
+    return render(request, "exam/view_exam_submissions.html", {'exam': exam, 'submissions': submissions})
 
 

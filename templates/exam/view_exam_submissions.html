@@ -1,0 +1,57 @@
+{% extends 'application/teacher_dashboard.html' %}
+
+{% block styles %}
+  {{ block.super }}
+  <style>
+    .table th {
+        padding: 10px;
+        font-size: 18px; 
+        font-weight: bold;
+        color: white;
+    }
+
+    .table tbody {
+        padding: 10px;
+        font-size: 15px; 
+        color: white;
+    }
+  </style>
+{% endblock %}
+
+{% block content %}
+  <h1>Exam Submissions: {{ exam.title }}</h1>
+  <table class="table">
+    <thead>
+      <tr>
+        <th>Student</th>
+        <th>Score</th>
+        <th>Questions Wrong</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for submission in submissions %}
+      <tr>
+        <td>{{ submission.student.username }}</td>
+        <td>{{ submission.score }} / {{exam.marks}}</td>
+        <td>
+          <ul>
+            {% for answer in submission.studentanswer_set.all %}
+              {% if not answer.is_correct %}
+                <li>{{ answer.question.question }}</li>
+              {% endif %}
+            {% endfor %}
+          </ul>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <br>
+  <a href="{% url 'base_exam' %}" class="nav__link">
+    <i class='bx bx-edit-alt'></i>
+    <span class="nav__name">Back to Exam Dashboard</span>
+    </a>
+{% endblock %}
+
+

@@ -38,7 +38,6 @@ class RewardAdmin(admin.ModelAdmin):
 class RewardPurchaseAdmin(admin.ModelAdmin):
     list_display = ('student', 'reward', 'quantity')
     search_fields = ('student', 'reward')
-    #ordering = ('cost',)
 
 @admin.register(Homework)
 class HomeworkAdmin(admin.ModelAdmin):
@@ -51,4 +50,16 @@ class EventAdmin(admin.ModelAdmin):
 @admin.register(AcademicEvent)
 class AcademicEventAdmin(admin.ModelAdmin):
     list_display = ('date', 'title', 'subject')
+
+@admin.register(Exam)
+class ExamAdmin(admin.ModelAdmin):
+    list_display = ('title', 'assigned_class', 'teacher', 'marks') 
+
+@admin.register(Question)
+class QuestionAdmin(admin.ModelAdmin):
+    list_display = ('exam', 'question', 'answer', 'marks') 
+
+@admin.register(ExamSubmission)
+class ExamSubmissionAdmin(admin.ModelAdmin):
+    list_display = ('exam', 'student', 'score') 
 

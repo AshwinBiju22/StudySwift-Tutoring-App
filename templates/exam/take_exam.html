@@ -1,0 +1,31 @@
+{% extends 'application/dashboard.html' %}
+
+{% block content %}
+
+  <h1>Exam : {{exam.title}}</h1>
+  <form method="post">
+    {% csrf_token %}
+    <ol>
+      {% for question, form in question_list %}
+        <hr>
+        <li>
+          Question : {{question.question}}
+          <br><br>
+          <ul>
+            <li><label>{{ question.op1 }}</label><br></li>
+            <li><label>{{ question.op2 }}</label><br></li>
+            <li><label>{{ question.op3 }}</label><br></li>
+            <li><label>{{ question.op4 }}</label><br></li>
+          </ul>
+          <br>
+          <label>{{ form.answer }}</label>
+          <br><br>
+          Marks : {{question.marks}}
+        </li>
+      {% endfor %}
+    </ol>
+    <button type="submit">Submit Exam</button>
+  </form>
+
+{% endblock %}
+

@@ -136,6 +136,39 @@ class AcademicEvent(models.Model):
     location = models.CharField(max_length=100)
     subject = models.CharField(max_length=100, null=True)
 
+class Exam(models.Model):
+    title = models.CharField(max_length=100)
+    assigned_class = models.ForeignKey(SchoolClass, on_delete=models.CASCADE)
+    teacher = models.ForeignKey(User, on_delete=models.CASCADE)
+    num_questions = models.IntegerField(default=1)
+    marks = models.IntegerField(default=1)
+
+    def __str__(self):
+        return self.title
+
+class Question(models.Model):
+    exam = models.ForeignKey(Exam, on_delete=models.CASCADE)
+    question = models.TextField()
+    op1 = models.CharField(max_length=255)
+    op2 = models.CharField(max_length=255)
+    op3 = models.CharField(max_length=255)
+    op4 = models.CharField(max_length=255)
+    answer = models.CharField(max_length=1)
+    marks = models.IntegerField(default=1)
+
+    def __str__(self):
+        return self.question
+    
+class ExamSubmission(models.Model):
+    student = models.ForeignKey(User, on_delete=models.CASCADE)
+    exam = models.ForeignKey(Exam, on_delete=models.CASCADE)
+    score = models.IntegerField(null=True, blank=True)
+
+class StudentAnswer(models.Model):
+    submission = models.ForeignKey(ExamSubmission, on_delete=models.CASCADE)
+    question = models.ForeignKey(Question, on_delete=models.CASCADE)
+    answer = models.CharField(max_length=1)
+    is_correct = models.BooleanField(default=False)
 
 
         

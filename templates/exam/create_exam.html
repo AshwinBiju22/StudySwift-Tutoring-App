@@ -1,0 +1,19 @@
+{% extends 'application/teacher_dashboard.html' %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+
+    <h1>Create Exam</h1>
+
+    <form method="post">
+        {% csrf_token %}
+        {{ exam_form.as_p }}
+        <button type="submit">Create Exam</button>
+    </form>
+  
+    <a href="{% url 'base_exam' %}" class="nav__link active-link">
+        <i class='bx bx-edit-alt'></i>
+        <span class="nav__name">Back to Exam Dashboard</span>
+    </a>
+
+{% endblock %}

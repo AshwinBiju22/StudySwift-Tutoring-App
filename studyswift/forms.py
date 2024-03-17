@@ -1,6 +1,6 @@
 from allauth.account.forms import SignupForm
 from django import forms
-from .models import UserProfile, Flashcard, SchoolClass, Homework, HomeworkSubmission, Message, Event
+from .models import StudentAnswer, UserProfile, Flashcard, SchoolClass, Homework, HomeworkSubmission, Message, Event, Exam, Question, ExamSubmission
 from django.contrib.auth.models import User
 from multiupload.fields import MultiFileField
 
@@ -78,3 +78,29 @@ class EventForm(forms.ModelForm):
             'start_datetime': forms.DateTimeInput(attrs={'type': 'datetime-local'}),
             'end_datetime': forms.DateTimeInput(attrs={'type': 'datetime-local'}),
         }
+
+class ExamForm(forms.Form):
+    title = forms.CharField(max_length=100)
+    assigned_class = forms.ModelChoiceField(queryset=SchoolClass.objects.all())
+    num_questions = forms.IntegerField(min_value=1, label="Number of Questions")
+
+class QuestionForm(forms.Form):
+    question = forms.CharField(widget=forms.Textarea)
+    op1 = forms.CharField(label="Option 1")
+    op2 = forms.CharField(label="Option 2")
+    op3 = forms.CharField(label="Option 3")
+    op4 = forms.CharField(label="Option 4")
+    answer = forms.ChoiceField(choices=[('1', 'Option 1'), ('2', 'Option 2'), ('3', 'Option 3'), ('4', 'Option 4')])
+    marks = forms.IntegerField(min_value=1)
+
+class ExamSubmissionForm(forms.ModelForm):
+    class Meta:
+        model = ExamSubmission
+        fields = []
+
+class StudentAnswerForm(forms.ModelForm):
+    answer = forms.ChoiceField(choices=[('1', 'Option 1'), ('2', 'Option 2'), ('3', 'Option 3'), ('4', 'Option 4')], widget=forms.RadioSelect)
+    
+    class Meta:
+        model = StudentAnswer
+        fields = ['answer']

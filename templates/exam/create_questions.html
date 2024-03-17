@@ -1,0 +1,18 @@
+{% extends 'application/teacher_dashboard.html' %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+
+<h1>Create Questions</h1>
+<form method="post">
+    {% csrf_token %}
+    {% for form in question_forms %}
+        <fieldset>
+            <legend>Question {{ forloop.counter }}</legend>
+            {{ form.as_p }}
+        </fieldset>
+    {% endfor %}
+    <button type="submit">Create Questions</button>
+</form>
+
+{% endblock %}

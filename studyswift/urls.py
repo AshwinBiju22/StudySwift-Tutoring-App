@@ -51,6 +51,12 @@ urlpatterns = [
 
     path('studybot/', views.bot, name='studybot'),
 
+    path('base_exam/', views.base_exam, name='base_exam'),
+    path('create_exam/', views.create_exam, name='create_exam'),
+    path('create_questions/<int:exam_id>/', views.create_questions, name='create_questions'),
+    path('take_exam/<int:exam_id>/', views.take_exam, name='take_exam'),
+    path('view_exam_submissions/<int:exam_id>/', views.view_exam_submissions, name='view_exam_submissions'),
+
     path('update-profile/', views.update_profile, name='update_profile'),
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

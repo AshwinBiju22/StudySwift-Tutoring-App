@@ -1,0 +1,21 @@
+{% extends 'application/dashboard.html' %}
+
+{% block content %}
+
+  <h1>Exam Dashboard</h1>
+
+  <h4>Existing Exams</h4>
+  {% for exam in exams %}
+    {% for question in exam %}
+      Title : {{question.title}} | Questions: {{question.num_questions}} <br>
+      <a href="{% url 'take_exam' question.id %}" class="nav__link">
+        <i class='bx bx-edit-alt'></i>
+        <span class="nav__name">Take Exam</span>
+      </a>
+      <br>
+    {% endfor %}
+  {% endfor %}
+  
+  
+
+{% endblock %}
