@@ -1,21 +1,30 @@
 {% extends 'application/dashboard.html' %}
 
 {% block content %}
-
   <h1>Exam Dashboard</h1>
 
-  <h4>Existing Exams</h4>
-  {% for exam in exams %}
-    {% for question in exam %}
-      Title : {{question.title}} | Questions: {{question.num_questions}} <br>
-      <a href="{% url 'take_exam' question.id %}" class="nav__link">
+  <h4>Pending Exams</h4>
+  {% if exam_without_submissions %}
+    {% for exam in exams_without_submissions %}
+      Title: {{ exam.title }} | Questions: {{ exam.num_questions }} <br>
+      <a href="{% url 'take_exam' exam.id %}" class="nav__link">
         <i class='bx bx-edit-alt'></i>
         <span class="nav__name">Take Exam</span>
       </a>
       <br>
     {% endfor %}
-  {% endfor %}
-  
-  
+  {% else %}
+      No pending exams
+      <br><br>
+  {% endif %}
 
+  <h4>Previous Exams</h4>
+  {% for exam in exams_with_submissions %}
+    {% for score in exam_score %}
+      Title: {{ exam.title }} | Marks: {{ score.score }} / {{ exam.marks }} <br>
+    {% endfor %}
+    <br>
+  {% endfor %}
+
+  
 {% endblock %}

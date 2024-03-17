@@ -762,11 +762,17 @@ def base_exam(request):
             return render(request, "exam/base_exam_teacher.html", {'exams': exams})
         else:
             classes = request.user.classes_enrolled.all()
-            exams = []
+            exams_with_submissions = []
+            exams_without_submissions = []
             for each_class in classes:
-                exam = Exam.objects.filter(assigned_class=each_class).all()
-                exams.append(exam)
-            return render(request, "exam/base_exam_student.html", {'exams': exams})
+                exams = Exam.objects.filter(assigned_class=each_class).all()
+                for exam in exams:
+                    if exam.examsubmission_set.filter(student=request.user).exists():
+                        exams_with_submissions.append(exam)
+                        exam_score = exam.examsubmission_set.filter(student=request.user)
+                    else:
+                        exams_without_submissions.append(exam)
+            return render(request, "exam/base_exam_student.html", {'exams_with_submissions': exams_with_submissions, 'exam_score': exam_score,'exams_without_submissions': exams_without_submissions})
 
 @login_required
 def create_exam(request):
