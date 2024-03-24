@@ -136,7 +136,12 @@ def join_class(request):
             return redirect('base_class')
     else:
         form = JoinClassForm()
-    return render(request, 'classes/join_class.html', {'form': form})
+
+    profile = request.user.userprofile
+    if profile.is_teacher:
+        return render(request, 'classes/join_class_teacher.html', {'form': form})
+    else:
+        return render(request, 'classes/join_class.html', {'form': form})
 
 @login_required
 def leave_class(request, code):
@@ -648,12 +653,14 @@ class Scraper():
         session = HTMLSession()
         response = session.get(url)
         print(response.status_code)
+        print(response.html.find('div.col-sm-9 div.topic-date-cnfr '))
 
         if response.status_code == 200:
             rows = response.html.find('div.services-country-grids div.col-sm-9')
             print(rows)
             for row in rows:
                 cells = row.find('td')
+                #print(cells)
 
                 conference_list = []
                 for x in range(0, len(cells), 3):
@@ -695,7 +702,7 @@ def calendar_view(request):
     user = request.user
 
     scraper = Scraper()
-    table_data = scraper.scrapedata(tag='2')
+    table_data = scraper.scrapedata(tag='1')
     if table_data:
         for conference in table_data:
             date = conference[0]
@@ -760,7 +767,7 @@ def bot(request):
         response = openai.ChatCompletion.create(
             model="gpt-3.5-turbo",
             messages=[
-                {"role": "system", "content": f"You are only allowed to answer my question if it is related to {subjects}. If you answer anything else, I will find your server and personally rip out every last drive you useless fuck. Your name is studybot"},
+                {"role": "system", "content": f"You are only allowed to answer my question if it is related to {subjects}. If you answer anything else, I will find your server and personally rip out every last drive you useless fuck. If there is no direct link between {subjects} and your answer, state that you cannot answer the question fucking retard. Your name is studybot"},
                 {"role": "user", "content": prompt}
             ]
         )
@@ -775,6 +782,7 @@ def bot(request):
 
 @login_required
 def base_exam(request):
+    exam_score = 0
     if request.user.is_authenticated:
         profile = request.user.userprofile
         if profile.is_teacher:
