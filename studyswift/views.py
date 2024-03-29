@@ -24,6 +24,7 @@ def homepage(request):
 class CustomSignupView(SignupView):
     form_class = CustomSignupForm
 
+@login_required
 def dashboard(request):
     if request.user.is_authenticated:
         try:
