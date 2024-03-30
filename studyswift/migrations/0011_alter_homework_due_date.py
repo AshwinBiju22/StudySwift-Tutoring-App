@@ -7,13 +7,15 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('studyswift', '0010_auto_20240129_2359'),
+        ("studyswift", "0010_auto_20240129_2359"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='homework',
-            name='due_date',
-            field=models.DateTimeField(default=datetime.datetime(2024, 2, 6, 0, 3, 17, 186757)),
+            model_name="homework",
+            name="due_date",
+            field=models.DateTimeField(
+                default=datetime.datetime(2024, 2, 6, 0, 3, 17, 186757)
+            ),
         ),
     ]

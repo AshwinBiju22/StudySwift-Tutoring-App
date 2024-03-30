@@ -7,17 +7,19 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('studyswift', '0012_alter_homework_due_date'),
+        ("studyswift", "0012_alter_homework_due_date"),
     ]
 
     operations = [
         migrations.RemoveField(
-            model_name='homework',
-            name='google_calendar_event_id',
+            model_name="homework",
+            name="google_calendar_event_id",
         ),
         migrations.AlterField(
-            model_name='homework',
-            name='due_date',
-            field=models.DateTimeField(default=datetime.datetime(2024, 2, 14, 19, 2, 56, 672056)),
+            model_name="homework",
+            name="due_date",
+            field=models.DateTimeField(
+                default=datetime.datetime(2024, 2, 14, 19, 2, 56, 672056)
+            ),
         ),
     ]

@@ -4,6 +4,7 @@ from bs4 import BeautifulSoup
 
 app = FastAPI()
 
+
 @app.get("/scrape-conferences/")
 async def scrape_conferences():
     print("Executing scrape_conferences function...")
@@ -18,10 +19,7 @@ async def scrape_conferences():
                 columns = row.find_all("td")
                 conference_date = columns[0].text.strip()
                 conference_name = columns[1].text.strip()
-                conferences.append({
-                    "date": conference_date,
-                    "name": conference_name
-                })
+                conferences.append({"date": conference_date, "name": conference_name})
             return {"conferences": conferences}
         else:
             return {"error": "Conference table not found"}
