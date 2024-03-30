@@ -634,6 +634,7 @@ def inbox(request):
 
 ###-------------------------------CALENDAR SYSTEM-------------------------------###
 
+
 class Scraper():
     SUBJECT_MAPPING = {
         'Engineering and Technology': ['engineering', 'technology', 'innovations', 'nanotechnology', 'robotics'],
@@ -650,20 +651,23 @@ class Scraper():
     }
 
     def scrapedata(self, tag):
-        url = f'https://www.allconferencealert.com/london.html?page={tag}'
+        url = f'https://allconferencealert.net/cities/london.php?page={tag}'
         session = HTMLSession()
         response = session.get(url)
         print(response.status_code)
-        print(response.html.find('div.col-sm-9 div.topic-date-cnfr '))
+        print(response.html.find('div.tab-pane table tbody tr'))
+
 
         if response.status_code == 200:
-            rows = response.html.find('div.services-country-grids div.col-sm-9')
-            print(rows)
+            rows = response.html.find('div.tab-pane table tbody tr')
+            #print(rows)
+            conference_list = []
+
             for row in rows:
                 cells = row.find('td')
                 #print(cells)
 
-                conference_list = []
+                
                 for x in range(0, len(cells), 3):
                     conference_date_str = cells[x].text.strip()
                     conference_date = self.format_date(conference_date_str)
@@ -675,6 +679,8 @@ class Scraper():
                     temp = [conference_date, conference_title, conference_location, conference_subject]
                     conference_list.append(temp) 
                 
+
+            print(conference_list)
             return conference_list
         else:
             print("Failed to fetch data.")
@@ -682,6 +688,7 @@ class Scraper():
         
     def format_date(self, date_str):
         day, month = date_str.split()
+        day = day.rstrip('stndrdth')
         year = '2024'
         month_map = {
             'Jan': '01', 'Feb': '02', 'Mar': '03', 'Apr': '04',
@@ -735,6 +742,12 @@ def add_event(request):
         if form.is_valid():
             event = form.save(commit=False)
             event.user = request.user
+            if event.start_datetime < timezone.now(): 
+                messages.error(request, "You cannot add an event in the past.")
+                return redirect('add_event')
+            elif event.start_datetime > event.end_datetime:
+                messages.error(request, "You cannot add an event in the past.")
+                return redirect('add_event')
             event.save()
             return redirect('calendar_view')
     else:

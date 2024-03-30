@@ -1,5 +1,6 @@
 {% load static %}
 
+
 <!DOCTYPE html>
     <html lang="en">
     <head>
@@ -26,6 +27,7 @@
     </head>
 
     <body>
+        
         <!--=============== NAV ===============-->
         <div class="nav" id="nav">
             <nav class="nav__content">
@@ -84,6 +86,7 @@
 
         <!--=============== MAIN ===============-->
         <main class="container section">
+            {% include "messages.html" %}
             {% block content %}{% endblock %}
 
         </main>
