@@ -100,15 +100,6 @@ TEMPLATES = [
     },
 ]
 
-SOCIALACCOUNT_PROVIDERS = {
-    "google": {
-        "APP": {
-            "client_id": "387581262920-s4b426rrivpvcpu0lg4l5l6arflgfe7o.apps.googleusercontent.com",
-            "secret": "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",
-            "key": "",
-        }
-    }
-}
 
 CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap4"
 CRISPY_TEMPLATE_PACK = "bootstrap4"
@@ -164,7 +155,6 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.2/howto/static-files/
 
 STATIC_URL = "/static/"
-# STATIC_ROOT = BASE_DIR / 'static'
 STATICFILES_DIRS = (os.path.join(BASE_DIR, "static"),)
 
 # Default primary key field type

@@ -42,7 +42,6 @@ import openai
 from django.db.models import Q
 from requests_html import HTMLSession
 
-
 # PATH OF APP DIRECTORY C:\Users\ashwi\Documents\studyswift_app\studyswift\
 
 ###-------------------------------DASHBOARD/LOGIN-------------------------------###
@@ -480,15 +479,11 @@ def test_flashcard(request, flashcard_ids):
 
 
 ###-------------------------------HOMEWORK TASKS/SUBMISSION-------------------------------###
-@login_required
-def manage_homework(request):
-    profile = request.user.userprofile
-    if profile.is_teacher:
-        homeworks = Homework.objects.filter(teacher=request.user)
-        return render(
-            request, "homework/manage_homework_teacher.html", {"homeworks": homeworks}
-        )
-    else:
+
+
+class StudentHomework:
+
+    def manage_homework(self, request):
         missingHomeworks = []
         pendingHomeworks = []
         student_classes = request.user.classes_enrolled.all()
@@ -514,136 +509,174 @@ def manage_homework(request):
                 "completedHomeworks": completedHomeworks,
             },
         )
+    
+    def remove_file(self, request, file_id, homework_id):
+        file = get_object_or_404(HomeworkFile, id=file_id)
+        file.delete()
+        return redirect("edit_homework", homework_id=homework_id)
+    
+    def view_homework(self, request, homework_id):
+        homework = get_object_or_404(Homework, id=homework_id)
+        teacher_files = homework.files.all()
+        student_submission = request.user.student_submissions.filter(
+            homework=homework
+        ).first()
 
+        if request.method == "POST":
+            completion_form = HomeworkCompletionForm(
+                request.POST, request.FILES, instance=student_submission
+            )
 
-@login_required
-def create_homework(request):
-    if request.method == "POST":
-        form = HomeworkForm(request.POST, request.FILES)
-        if form.is_valid():
-            homework = form.save(commit=False)
-            homework.teacher = request.user
-            homework.save()
+            if completion_form.is_valid():
+                submission = completion_form.save(commit=False)
+                submission.homework = homework
+                submission.student = request.user
+                submission.save()
 
-            for file in request.FILES.getlist("files"):
-                homework.files.create(file=file)
-
-            form.save_m2m()
-
-            messages.success(request, "Homework created successfully!")
-
-            return redirect("manage_homework")
-    else:
-        form = HomeworkForm()
-
-    return render(
-        request,
-        "homework/create_homework.html",
-        {"form": form, "classes": SchoolClass.objects.all()},
-    )
-
-
-@login_required
-def edit_homework(request, homework_id):
-    homework = get_object_or_404(Homework, id=homework_id)
-
-    if request.user != homework.teacher:
-        return redirect("manage_homework")
-
-    if request.method == "POST":
-        form = HomeworkForm(request.POST, request.FILES, instance=homework)
-        if form.is_valid():
-
-            new_homework = form.save(commit=False)
-
-            if "files" in request.FILES:
                 for file in request.FILES.getlist("files"):
-                    new_file = HomeworkFile(file=file)
-                    new_file.save()
-                    new_homework.files.add(new_file)
+                    homework_file = HomeworkFile.objects.create(studentfile=file)
+                    submission.files.add(homework_file)
 
-            new_homework.save()
-            form.save_m2m()
+                messages.success(request, "Homework marked as completed.")
+                return redirect("view_homework", homework_id=homework_id)
+        else:
+            completion_form = HomeworkCompletionForm(instance=student_submission)
 
-            return redirect("manage_homework")
-    else:
-        form = HomeworkForm(instance=homework)
-
-    return render(
-        request, "homework/edit_homework.html", {"form": form, "homework": homework}
-    )
-
-
-@login_required
-def remove_file(request, file_id, homework_id):
-    file = get_object_or_404(HomeworkFile, id=file_id)
-    file.delete()
-    return redirect("edit_homework", homework_id=homework_id)
-
-
-@login_required
-def delete_homework(request, homework_id):
-    homework = get_object_or_404(Homework, id=homework_id)
-
-    if request.user == homework.teacher:
-        homework.delete()
-
-    return redirect("manage_homework")
-
-
-@login_required
-def view_homework(request, homework_id):
-    homework = get_object_or_404(Homework, id=homework_id)
-    teacher_files = homework.files.all()
-    student_submission = request.user.student_submissions.filter(
-        homework=homework
-    ).first()
-
-    if request.method == "POST":
-        completion_form = HomeworkCompletionForm(
-            request.POST, request.FILES, instance=student_submission
+        return render(
+            request,
+            "homework/view_homework.html",
+            {
+                "homework": homework,
+                "teacher_files": teacher_files,
+                "completion_form": completion_form,
+                "student_submission": student_submission,
+            },
         )
 
-        if completion_form.is_valid():
-            submission = completion_form.save(commit=False)
-            submission.homework = homework
-            submission.student = request.user
-            submission.save()
+class TeacherHomework(StudentHomework):
 
-            for file in request.FILES.getlist("files"):
-                homework_file = HomeworkFile.objects.create(studentfile=file)
-                submission.files.add(homework_file)
+    def manage_homework(self, request):
+        homeworks = Homework.objects.filter(teacher=request.user)
+        return render(
+            request, "homework/manage_homework_teacher.html", {"homeworks": homeworks}
+        )
+    
+    def create_homework(self, request):
+        if request.method == "POST":
+            form = HomeworkForm(request.POST, request.FILES)
+            if form.is_valid():
+                homework = form.save(commit=False)
+                homework.teacher = request.user
+                homework.save()
 
-            messages.success(request, "Homework marked as completed.")
-            return redirect("view_homework", homework_id=homework_id)
+                for file in request.FILES.getlist("files"):
+                    homework.files.create(file=file)
+
+                form.save_m2m()
+
+                messages.success(request, "Homework created successfully!")
+
+                return redirect("manage_homework")
+        else:
+            form = HomeworkForm()
+
+        return render(
+            request,
+            "homework/create_homework.html",
+            {"form": form, "classes": SchoolClass.objects.all()},
+        )
+
+    def edit_homework(self, request, homework_id):
+        homework = get_object_or_404(Homework, id=homework_id)
+
+        if request.user != homework.teacher:
+            return redirect("manage_homework")
+
+        if request.method == "POST":
+            form = HomeworkForm(request.POST, request.FILES, instance=homework)
+            if form.is_valid():
+
+                new_homework = form.save(commit=False)
+
+                if "files" in request.FILES:
+                    for file in request.FILES.getlist("files"):
+                        new_file = HomeworkFile(file=file)
+                        new_file.save()
+                        new_homework.files.add(new_file)
+
+                new_homework.save()
+                form.save_m2m()
+
+                return redirect("manage_homework")
+        else:
+            form = HomeworkForm(instance=homework)
+
+        return render(
+            request, "homework/edit_homework.html", {"form": form, "homework": homework}
+        )
+
+    def delete_homework(self, request, homework_id):
+        homework = get_object_or_404(Homework, id=homework_id)
+
+        if request.user == homework.teacher:
+            homework.delete()
+
+        return redirect("manage_homework")
+
+    def view_submissions(self, request, homework_id):
+        homework = get_object_or_404(Homework, id=homework_id)
+        submissions = HomeworkSubmission.objects.filter(homework=homework)
+
+        return render(
+            request,
+            "homework/view_submissions.html",
+            {
+                "homework": homework,
+                "submissions": submissions,
+            },
+        )
+
+@login_required
+def user_manage_homework(request):
+    profile = request.user.userprofile
+    if profile.is_teacher:
+        return TeacherHomework().manage_homework(request)
     else:
-        completion_form = HomeworkCompletionForm(instance=student_submission)
-
-    return render(
-        request,
-        "homework/view_homework.html",
-        {
-            "homework": homework,
-            "teacher_files": teacher_files,
-            "completion_form": completion_form,
-            "student_submission": student_submission,
-        },
-    )
+        return StudentHomework().manage_homework(request)
 
 
 @login_required
-def view_submissions(request, homework_id):
-    homework = get_object_or_404(Homework, id=homework_id)
-    submissions = HomeworkSubmission.objects.filter(homework=homework)
+def teacher_create_homework(request):
+    return TeacherHomework().create_homework(request)
 
-    return render(
-        request,
-        "homework/view_submissions.html",
-        {
-            "homework": homework,
-            "submissions": submissions,
-        },
-    )
+
+@login_required
+def teacher_edit_homework(request, homework_id):
+    return TeacherHomework().edit_homework(request, homework_id)
+
+
+@login_required
+def remove_file_function(request, file_id, homework_id):
+    profile = request.user.userprofile
+    if profile.is_teacher:
+        return TeacherHomework().remove_file(request, file_id, homework_id)
+    else:
+        return StudentHomework().remove_file(request, file_id, homework_id)
+
+
+@login_required
+def teacher_delete_homework(request, homework_id):
+    return TeacherHomework().delete_homework(request, homework_id)
+
+
+@login_required
+def student_view_homework(request, homework_id):
+    return StudentHomework().view_homework(request, homework_id)
+
+
+@login_required
+def teacher_view_submissions(request, homework_id):
+    return TeacherHomework().view_submissions(request, homework_id)
 
 
 ###-------------------------------SETTINGS/PROFILE-------------------------------###
@@ -684,8 +717,8 @@ def update_profile(request):
 ###-------------------------------MESSAGING SYSTEM-------------------------------###
 def filter_inappropriate_content(message_content):
     inappropriate_patterns = [
-        r"\bshit\b",
-        r"\bfuck\b",
+        r"shit",
+        r"fuck",
     ]
 
     regex_patterns = [
@@ -711,7 +744,6 @@ def send_message(request, recipient_id):
             message.recipient = recipient
 
             if filter_inappropriate_content(message.content):
-                print("Your message is inappropriate")
                 messages.error(request, "Your message contains inappropriate content.")
                 return redirect("send_message", recipient_id=recipient_id)
             else:
