@@ -119,7 +119,7 @@
                               {% for student in school_class.students.all %}
                                   <li>
                                       {{ student }}
-                                      <a href="{% url 'remove_student' school_class.code student.id %}" class="button delete-button">🗑️ Delete</a>
+                                      <a href="{% url 'remove_student' school_class.code student.id %}" class="button delete-button">🗑️ Remove</a>
                                   </li>
                               {% endfor %}
                           </ul>

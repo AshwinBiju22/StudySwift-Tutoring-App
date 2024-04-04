@@ -117,7 +117,7 @@ def dashboard(request):
                     },
                 )
         except UserProfile.DoesNotExist:
-            return render(request, "application/feature_dashboard.html")
+            return redirect("homepage")
 
     return render(request, "application/feature_dashboard.html")
 
@@ -391,6 +391,7 @@ def self_rev(request):
         .annotate(count=Count("subject"))
         .order_by("subject")
     )
+    print(flashcard_data)
 
     flashcard_subjects = [data["subject"] for data in flashcard_data]
     flashcard_counts = [data["count"] for data in flashcard_data]
@@ -680,6 +681,7 @@ def teacher_view_submissions(request, homework_id):
 
 
 ###-------------------------------SETTINGS/PROFILE-------------------------------###
+@login_required
 def update_profile(request):
     if request.method == "POST":
         profile_form = UserProfileUpdateForm(
@@ -1081,7 +1083,7 @@ def delete_event(request, event_id):
 
 ###-------------------------------STUDYBOT-------------------------------###
 
-
+@login_required
 def bot(request):
     if request.method == "POST":
         subjects = request.POST.get("subjects")

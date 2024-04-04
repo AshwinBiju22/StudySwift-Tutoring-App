@@ -82,6 +82,7 @@ LOGIN_REDIRECT_URL = "/dashboard"
 EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_EMAIL_VERIFICATION = "mandatory"
+ACCOUNT_SESSION_REMEMBER = True
 
 TEMPLATES = [
     {

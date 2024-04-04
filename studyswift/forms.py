@@ -16,10 +16,9 @@ from .models import (
 from django.contrib.auth.models import User
 from multiupload.fields import MultiFileField
 
-
 class CustomSignupForm(SignupForm):
     is_teacher = forms.BooleanField(required=False)
-    is_admin = forms.BooleanField(required=False)
+    is_admin = forms.BooleanField(required=False, widget=forms.HiddenInput())
 
     def save(self, request):
         user = super().save(request)
