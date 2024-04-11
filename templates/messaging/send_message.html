@@ -1,12 +1,10 @@
 {% extends 'application/dashboard.html' %}
-
 {% block styles %}
 <style>
     .chat-messages {
         max-width: 600px;
         margin: 20px auto;
     }
-
     .sent, .received {
         position: relative;
         background-color: #080a72;
@@ -15,30 +13,25 @@
         margin-bottom: 10px;
         border-radius: 10px;
     }
-
     .received {
         background-color: #53048c;
         text-align: left;
     }
-
     .edit-delete {
         position: absolute;
         top: 0;
         right: 0;
         display: none;
     }
-
     .sent:hover .edit-delete, .received:hover .edit-delete {
         display: block;
     }
-
     form {
         margin-top: 20px;
         display: flex;
         flex-direction: column;
         align-items: center;
     }
-
     form textarea {
         width: 90%;
         padding: 10px;
@@ -46,7 +39,6 @@
         border: 1px solid #183d5c;
         border-radius: 5px;
     }
-
     button {
         background-color: #3110b8;
         color: white;
@@ -57,12 +49,10 @@
         width: 10%;
         text-align: center;
     }
-
     form label {
         display: block;
         margin-bottom: 5px;
     }
-
     .inbox {
         background-color: #c3c2c8;
         color: white;
@@ -75,9 +65,7 @@
     }
 </style>
 {% endblock %}
-
 {% block content %}
-
 <h2>Chat with {{ recipient.username }}</h2>
 <div class="chat-messages">
     {% for message in messages %}
@@ -98,11 +86,9 @@
     {{ form.as_p }}
     <button type="submit">Send</button>
 </form>
-
 <div class="inbox">
   <a href="{% url 'clear_chat' recipient_id=recipient.id %}">Clear Chat</a>
 </div>
-
 <div class="inbox">
     <a href="{% url 'inbox' %}">Back to Inbox</a>
 </div>

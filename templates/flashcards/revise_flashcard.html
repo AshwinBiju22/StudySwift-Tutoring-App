@@ -11,7 +11,6 @@
             margin: 0;
             padding: 0;
         }
-
         .container {
             max-width: 800px;
             margin: 20px auto;
@@ -20,7 +19,6 @@
             border-radius: 12px;
             box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
         }
-
         .navbar {
             background-color: #3498db;
             padding: 15px 0;
@@ -28,12 +26,10 @@
             color: white;
             box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
         }
-
         .navbar h1 {
             margin: 0;
             font-size: 32px;
         }
-
         .flashcard {
             background-color: #ffffff;
             border: 1px solid #bdc3c7;
@@ -43,21 +39,17 @@
             transition: box-shadow 0.3s ease;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         }
-
         .flashcard:hover {
             box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
         }
-
         label {
             display: block;
             margin-bottom: 8px;
             color: #555;
         }
-
         input[type="checkbox"] {
             margin-right: 5px;
         }
-
         button {
             background-color: #2980b9;
             color: white;
@@ -68,11 +60,9 @@
             margin-right: 10px;
             transition: background-color 0.3s ease;
         }
-
         button:hover {
             background-color: #1f6698;
         }
-
         .home-link {
             display: block;
             text-align: center;
@@ -84,7 +74,6 @@
             margin-top: 20px;
             transition: background-color 0.3s ease;
         }
-
         .home-link:hover {
             background-color: #1f6698;
         }
@@ -94,7 +83,6 @@
     <div class="navbar">
         <h1>Flashcard Revise</h1>
     </div>
-
     <div class="container">
         <form method="post">
             {% csrf_token %}
@@ -111,7 +99,6 @@
             <button type="submit" name="test">Test Flashcards</button>
             <button type="submit" name="create">Create Flashcards</button>
         </form>
-
         <a href="{% url 'self_rev' %}" class="home-link">
             <button>Home</button>
         </a>

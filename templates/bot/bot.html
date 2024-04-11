@@ -1,5 +1,4 @@
 {% extends 'application/dashboard.html' %}
-
 {% block styles %}
     <style>
         .bot-container {
@@ -23,7 +22,6 @@
 
             animation: bounce 0.5s infinite alternate;
         }
-        /* Keyframes for the bot head movement */
         @keyframes bounce {
             0% {
                 transform: translateY(0);
@@ -58,7 +56,6 @@
             border-radius: 5px;
             animation: moveMouth 1s infinite alternate;
         }
-        /* Keyframes for the mouth movement */
         @keyframes moveMouth {
             0%, 100% {
                 height: 10px;
@@ -75,7 +72,6 @@
         }
     </style>
 {% endblock %}
-
 {% block content %}
     <div class="bot-container">
         <div class="bot-head">

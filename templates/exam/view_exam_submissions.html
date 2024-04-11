@@ -1,5 +1,4 @@
 {% extends 'application/teacher_dashboard.html' %}
-
 {% block styles %}
   {{ block.super }}
   <style>
@@ -9,7 +8,6 @@
         font-weight: bold;
         color: white;
     }
-
     .table tbody {
         padding: 10px;
         font-size: 15px; 
@@ -17,7 +15,6 @@
     }
   </style>
 {% endblock %}
-
 {% block content %}
   <h1>Exam Submissions: {{ exam.title }}</h1>
   <table class="table">
@@ -46,12 +43,9 @@
       {% endfor %}
     </tbody>
   </table>
-
   <br>
   <a href="{% url 'base_exam' %}" class="nav__link">
     <i class='bx bx-edit-alt'></i>
     <span class="nav__name">Back to Exam Dashboard</span>
     </a>
 {% endblock %}
-
-

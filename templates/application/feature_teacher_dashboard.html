@@ -1,7 +1,5 @@
 {% extends 'application/teacher_dashboard.html' %}
-
 {% block content %}
-
   <style>
     .class-container {
         margin-bottom: 20px;
@@ -10,20 +8,16 @@
         padding: 10px;
         border-radius: 5px;
     }
-
     .class-header {
         font-size: 20px;
         font-weight: bold;
     }
-
     .teacher-student-list {
         padding-left: 20px;
     }
 </style>
-
   <h1>Dashboard</h1>
   {% include "messages.html" %}
-
     <!-- User Profile Section -->
     <div class="dashboard-card">
       <h2 class="black-colour">Your Profile</h2>
@@ -40,7 +34,6 @@
         </div>
       </div>
     </div>
-
     <div class="dashboard-card-blue">
       <h2 class="black-colour">Welcome {{ user.username }}!</h2>
       <div class="profile-section">
@@ -64,30 +57,21 @@
             </div>
             {% endfor %}
         </div>
-
-
         </div>
       </div>
     </div>
-
-
   </div>
-
 {% endblock %}
-
 {% block chart_js %}
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 {% endblock %}
-
 {% block styles %}
   <style>
-    /* Add or adjust styles as needed */
     .dashboard-sections {
       display: flex;
       justify-content: space-around;
       flex-wrap: wrap;
     }
-
     .dashboard-card {
       width: 45%;
       margin: 20px;
@@ -97,7 +81,6 @@
       background-color: #c21e1b;
       box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     }
-
     .dashboard-card-blue {
       width: 45%;
       margin: 20px;
@@ -107,37 +90,30 @@
       background-color: #2a75a4;
       box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     }
-
     .greeting-message {
       margin-bottom: 20px;
       color: rgb(0, 0, 0);
     }
-
     .black-colour {
       color: rgb(0, 0, 0);
     }
-
     .profile-picture {
-      width: 100%; /* Adjust the size as needed */
+      width: 100%;
       height: 400px;
       overflow: hidden;
       border-radius: 800px;
-      border: 2px solid #000000; /* Optional: add a border */
-      box-shadow: 0 0 5px rgba(0, 0, 0, 0.2); /* Optional: add a box shadow */
+      border: 2px solid #000000;
+      box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
     }
-
     .profile-picture img {
       width: 100%;
       height: auto;
       display: block;
     }
-
     .no-profile-picture {
       width: 100%;
       height: 100%;
-      background-color: #ddd; /* Optional: add a background color for the placeholder */
+      background-color: #ddd;
     }
-
   </style>
 {% endblock %}
-

@@ -1,47 +1,38 @@
 {% extends 'application/dashboard.html' %}
-
 {% block chart_js %}
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 {% endblock %}
-
 {% block styles %}
     <style>
-
         #chart-container {
-            margin-top: 50px; /* Adjust the margin-top value as needed */
+            margin-top: 50px;
             display: flex;
             flex-direction: column;
             align-items: center;
             text-align: center;
         }
-
         #pointsChart {
-            width: 500px; /* Adjust the width as needed */
-            height: 500px; /* Adjust the height as needed */
+            width: 500px;
+            height: 500px;
         }
-
         .grid-container {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
             gap: 20px;
             margin-top: 50px;
         }
-
         .grid-item {
             border: 1px solid #ccc;
             padding: 15px;
             border-radius: 8px;
         }
-
         .reward-list {
             list-style: none;
             padding: 0;
         }
-
         .reward-list li {
             margin-bottom: 10px;
         }
-
         .reward-list a {
             display: inline-block;
             padding: 4px;
@@ -51,27 +42,20 @@
             border-radius: 4px;
             transition: background-color 0.3s;
         }
-
         .reward-list a:hover {
             background-color: #151c57;
         }
-
         .reward-title {
             margin-top: 100px;
         }
     </style>
 {% endblock %}
-
-
 {% block content %}
   <h1>Rewards</h1>
   {% include "messages.html" %}
-
   <div id="chart-container">
     <canvas id="pointsChart"></canvas>
   </div>
-
-
   <script>
     var ctxPoints = document.getElementById('pointsChart').getContext('2d');
     var pointsChart = new Chart(ctxPoints, {
@@ -93,17 +77,11 @@
         },
       },
     });
-
-    
   </script>
-
-  
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
   <div class="reward-title">
     <h1>Reward Store</h1>
   </div>
-
   <div class="grid-container">
     <div class="grid-item">
       <h2>Available Rewards</h2>
@@ -117,7 +95,6 @@
         {% endfor %}
       </ul>
     </div>
-
     <div class="grid-item">
       <h2>Your Locker</h2>
       {% if reward_quantity_list %}
@@ -129,13 +106,9 @@
       {% else %}
         <p>Your locker is empty.</p>
       {% endif %}
-      
     </div>
-
     <div class="grid-item">
       <p>Your current good points: {{ user_profile.good_points }}</p>
     </div>
   </div>
-
-
 {% endblock %}

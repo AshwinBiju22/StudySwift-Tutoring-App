@@ -4,26 +4,27 @@
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sign In</title>
 
-    <!-- Bootstrap CSS -->
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+        integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
 
     <style>
         body {
             background-color: #1a1a1a;
             color: #ffffff;
             font-family: 'Arial', sans-serif;
-            padding-top: 50px; /* Add padding to top */
+            padding-top: 50px;
         }
 
         .container {
             max-width: 600px;
-            margin: auto; /* Center the container horizontally */
+            margin: auto;
             padding: 30px;
             background-color: #333333;
             border-radius: 10px;
@@ -63,37 +64,43 @@
         .text-center {
             text-align: center;
         }
-
     </style>
 </head>
+
 <body>
 
-<div class="container">
-    <div class="row justify-content-center"> <!-- Center the row content -->
-        <div class="col-md-8">
-            <h1>Sign In</h1>
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <h1>Sign In</h1>
 
-            <p>If you have not created an account yet, then please <a href="/accounts/signup/">sign up</a> first.</p>
+                <p>If you have not created an account yet, then please <a href="/accounts/signup/">sign up</a> first.
+                </p>
 
-            <form method="post" action="/accounts/login/">
-                {% csrf_token %}
-                {{ form|crispy }}
-                <div class="form-group">
-                    <button type="submit" class="btn btn-primary">Sign In</button>
-                </div>
-            </form>
+                <form method="post" action="/accounts/login/">
+                    {% csrf_token %}
+                    {{ form|crispy }}
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-primary">Sign In</button>
+                    </div>
+                </form>
 
+                <hr>
 
-            <hr>
-
+            </div>
         </div>
     </div>
-</div>
 
-<!-- Bootstrap JS and Popper.js -->
-<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-U7Uo6Csm/PQqBxysX1SDPu5znQ41Zj3IuZDz8VISVZ4eq86XFKFDK4BvPQy1g8Ifj" crossorigin="anonymous"></script>
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+        integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous">
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
+        integrity="sha384-U7Uo6Csm/PQqBxysX1SDPu5znQ41Zj3IuZDz8VISVZ4eq86XFKFDK4BvPQy1g8Ifj" crossorigin="anonymous">
+    </script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
+        integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous">
+    </script>
 
 </body>
+
 </html>

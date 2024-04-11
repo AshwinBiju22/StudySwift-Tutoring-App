@@ -1,40 +1,30 @@
 {% extends 'application/dashboard.html' %}
 {% load tz %}
-
 {% block styles%}
 <style>
-  
     .homework-section {
     margin-bottom: 20px;
     border: 1px solid #ccc;
     padding: 10px;
     }
-
-    /* Style for each homework-entry */
     .homework-entry {
     margin-bottom: 10px;
     padding: 10px;
     background-color: #100764;
     }
-
-    /* Style for links within homework-entry */
     .homework-entry a {
     color: #0f8c26;
     text-decoration: none;
     margin-left: 10px;
     }
-
     .homework-entry a:hover {
     text-decoration: underline;
     }
 </style>
 {% endblock %}
-
 {% block content %}
-
   <h1>Homework</h1>
   {% include "messages.html" %}
-
   <div class="homework-section missing-homeworks">
     <h2 style="color: rgb(205, 32, 32);">Missing Homeworks</h2>
     {% if missingHomeworks %}
@@ -49,7 +39,6 @@
       <p>No missing homework.</p>
     {% endif %}
   </div>
-
   <div class="homework-section pending-homeworks">
     <h2 style="color: rgb(207, 170, 57);">Pending Homeworks</h2>
     {% if pendingHomeworks %}
@@ -64,7 +53,6 @@
       <p>No pending homework.</p>
     {% endif %}
   </div>
-
   <div class="homework-section completed-homeworks">
     <h2 style="color: rgb(24, 198, 24);">Completed Homeworks</h2>
     {% if completedHomeworks %}
@@ -79,11 +67,9 @@
       <p>No completed homework.</p>
     {% endif %}
   </div>
-
   <br>
   <a href="{% url 'base_exam' %}" class="nav__link" style="font-size: 26px;">
       <i class='bx bx-spreadsheet' style="font-size: 26px;"></i>
       <span class="nav__name" style="font-size: 26px;">Exams</span>
   </a>
-
 {% endblock %}

@@ -1,6 +1,7 @@
 from django.test import TestCase
 from studyswift.views import filter_inappropriate_content
 
+
 class FilterContentTestCase(TestCase):
     def test_filter_inappropriate_content(self):
         # Acceptable

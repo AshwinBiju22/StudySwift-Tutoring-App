@@ -1,7 +1,5 @@
 {% extends 'application/dashboard.html' %}
-
 {% block content %}
-
   <h1>Exam : {{exam.title}}</h1>
   <form method="post">
     {% csrf_token %}
@@ -26,6 +24,4 @@
     </ol>
     <button type="submit">Submit Exam</button>
   </form>
-
 {% endblock %}
-

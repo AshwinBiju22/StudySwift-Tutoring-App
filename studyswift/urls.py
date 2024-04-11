@@ -38,7 +38,11 @@ urlpatterns = [
     ),
     path("manage_homework/", views.user_manage_homework, name="manage_homework"),
     path("create_homework/", views.teacher_create_homework, name="create_homework"),
-    path("edit_homework/<int:homework_id>/", views.teacher_edit_homework, name="edit_homework"),
+    path(
+        "edit_homework/<int:homework_id>/",
+        views.teacher_edit_homework,
+        name="edit_homework",
+    ),
     path(
         "delete_homework/<int:homework_id>/",
         views.teacher_delete_homework,
@@ -49,7 +53,11 @@ urlpatterns = [
         views.remove_file_function,
         name="remove_file",
     ),
-    path("view_homework/<int:homework_id>/", views.student_view_homework, name="view_homework"),
+    path(
+        "view_homework/<int:homework_id>/",
+        views.student_view_homework,
+        name="view_homework",
+    ),
     path(
         "view_submissions/<int:homework_id>/",
         views.teacher_view_submissions,

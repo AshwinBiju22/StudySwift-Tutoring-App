@@ -1,12 +1,8 @@
 {% extends 'application/dashboard.html' %}
-
 {% block title %}Calendar{% endblock %}
-
 {% block content %}
     <div id='calendar'></div>
-
     <br>
-
     <form method="get">
         <label for="subject">Select Subject:</label>
         <select name="subject" id="subject">
@@ -24,18 +20,14 @@
         </select>
         <button type="submit">Filter</button>
     </form>
-    
-
     <a href="{% url 'add_event' %}">Add Event</a>
     {% for event in events %}
         <p>{{ event.title }} - {{ event.start_datetime|date:'Y-m-d' }} - {{ event.end_datetime }}</p>
         <a href="{% url 'delete_event' event.id %}">Delete Event</a>
     {% endfor %}
-
     {% for academic_event in academic_events %}
         <p>{{ academic_event.date }} - {{ academic_event.title }} - {{ academic_event.subject }}</p>
     {% endfor %}
-
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             var calendarEl = document.getElementById('calendar');
@@ -59,7 +51,6 @@
                     {% endfor %}
                 ],
             });
-
             calendar.render();
         });
     </script>

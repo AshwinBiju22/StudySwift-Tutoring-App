@@ -1,51 +1,42 @@
 {% extends 'application/dashboard.html' %}
-
 {% block styles %}
 <style>
-    .profile-picture {
-    width: 500px; /* Adjust the size as needed */
+.profile-picture {
+    width: 500px;
     height: 500px;
     overflow: hidden;
     border-radius: 50%;
-    border: 2px solid #ffffff; /* Optional: add a border */
-    box-shadow: 0 0 5px rgba(0, 0, 0, 0.2); /* Optional: add a box shadow */
+    border: 2px solid #ffffff;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
     float: right;
-
 }
-
 .profile-picture img {
     width: 100%;
     height: auto;
     display: block;
 }
-
 .no-profile-picture {
     width: 100%;
     height: 100%;
-    background-color: #ddd; /* Optional: add a background color for the placeholder */
+    background-color: #ddd;
 }
-
 .cool-button.revise {
     background-color: #102f5e;
     color: white;
     border-radius: 35%;
 }
-    
 .cool-button:hover {
     background-color: #29b9a6;
 }
 </style>
 {% endblock %}
-
 {% block content %}
     <h1>Settings</h1>
-
     <form method="post" enctype="multipart/form-data">
         {% csrf_token %}
         {{ profile_form.as_p }}
     <button type="submit">Update Profile Picture</button>
     </form>
-
     <div class="profile-picture">
         {% if user.userprofile.profile_picture %}
         <img src="{{ user.userprofile.profile_picture.url }}" alt="Profile Picture">
@@ -53,21 +44,18 @@
             <div class="no-profile-picture"></div>
         {% endif %}
     </div>
-
     <div>
     <a href="{% url 'account_logout' %}" class="cool-button revise">
         <i class='bx bx-edit-alt' ></i>
         <span>Sign Out</span>
     </a>
     </div>
-
     <div>
     <a href="{% url 'account_reset_password' %}" class="cool-button revise">
         <i class='bx bx-edit-alt' ></i>
         <span>Password Reset</span>
     </a>
     </div>
-
     <div>
         <br>
         <h4>Personal Details:</h4>
@@ -75,5 +63,4 @@
         <p>Email : {{ user.email }}</p>
 
     </div>
-
 {% endblock %}

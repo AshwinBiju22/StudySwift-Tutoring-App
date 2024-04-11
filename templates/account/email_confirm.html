@@ -1,12 +1,12 @@
 {% extends "account/base_entrance.html" %}
 {% load i18n %}
+{% load account %}
 {% load allauth %}
-
 {% block head_title %}
-    {% trans "Change Password" %}
+    {% trans "Confirm Email Address" %}
 {% endblock head_title %}
-
 {% block content %}
+
     <style>
         body {
             background-color: #121212;
@@ -34,28 +34,10 @@
         p {
             color: #ffffff;
             margin-bottom: 20px;
+            margin-left: 470px;
         }
 
-        .nav {
-            margin-bottom: 30px;
-            text-align: center;
-        }
 
-        .nav .nav-item {
-            display: inline-block;
-            margin-right: 15px;
-        }
-
-        .nav-link {
-            color: #61dafb;
-            text-decoration: none;
-            transition: color 0.3s ease;
-        }
-
-        .nav-link:hover {
-            text-decoration: underline;
-            color: #42a5f5;
-        }
 
         form {
             max-width: 400px;
@@ -81,16 +63,15 @@
         }
 
         button[type="submit"] {
-            background-color: #61dafb;
+            background-color: #007bff;
             border: none;
             width: 100%;
             padding: 10px;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
         }
 
         button[type="submit"]:hover {
-            background-color: #4285f4;
+            background-color: #0056b3;
+            border: none;
         }
 
         div {
@@ -122,37 +103,33 @@
         }
     </style>
 
-    <div class="container">
-        <h1>
-            {% if token_fail %}
-                {% trans "Bad Token" %}
-            {% else %}
-                {% trans "Change Password" %}
-            {% endif %}
-        </h1>
-            <li class="nav-item">
-                <a class="nav-link" href="/accounts/login/">Sign In</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="/accounts/signup/">Sign Up</a>
-            </li>
-        {% if token_fail %}
-            {% url 'account_reset_password' as passwd_reset_url %}
+    {% element h1 %}
+        {% trans "Confirm Email Address" %}
+    {% endelement %}
+    {% if confirmation %}
+        {% user_display confirmation.email_address.user as user_display %}
+        {% if can_confirm %}
             <p>
-                {% blocktrans %}The password reset link was invalid, possibly because it has already been used. Please request a 
-                <a href="{{ passwd_reset_url }}" style="color: #64b5f6;">new password reset</a>.{% endblocktrans %}
+                {% blocktrans with confirmation.email_address.email as email %}Please confirm that <a href="mailto:{{ email }}">{{ email }}</a> is an email address for user {{ user_display }}.{% endblocktrans %}
             </p>
+            {% url 'account_confirm_email' confirmation.key as action_url %}
+            {% element form method="post" action=action_url %}
+                {% slot actions %}
+                    {% csrf_token %}
+                    {% element button type="submit" %}
+                        {% trans 'Confirm' %}
+                    {% endelement %}
+                {% endslot %}
+            {% endelement %}
         {% else %}
-            <form method="post" action="{{ action_url }}">
-                {% csrf_token %}
-                {% for field in form %}
-                    <div class="form-group">
-                        {{ field.label_tag }}
-                        {{ field }}
-                    </div>
-                {% endfor %}
-                <button type="submit">{% trans 'Change Password' %}</button>
-            </form>
+            <p>
+                {% blocktrans %}Unable to confirm {{ email }} because it is already confirmed by a different account.{% endblocktrans %}
+            </p>
         {% endif %}
-    </div>
+    {% else %}
+        {% url 'account_email' as email_url %}
+        <p>
+            {% blocktrans %}This email confirmation link expired or is invalid. Please <a href="{{ email_url }}">issue a new email confirmation request</a>.{% endblocktrans %}
+        </p>
+    {% endif %}
 {% endblock content %}

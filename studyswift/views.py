@@ -46,13 +46,21 @@ from requests_html import HTMLSession
 
 ###-------------------------------DASHBOARD/LOGIN-------------------------------###
 
+""" Homepage with sign in and sign up buttons """
+
 
 def homepage(request):
     return render(request, "application/homepage.html")
 
 
+""" Adds teacher role option in sign up """
+
+
 class CustomSignupView(SignupView):
     form_class = CustomSignupForm
+
+
+""" Dashboard displaying points, results, classes, rewards """
 
 
 @login_required
@@ -74,18 +82,8 @@ def dashboard(request):
                 student_username = request.user.username
                 student = User.objects.get(username=student_username)
 
-                good_points = (
-                    UserProfile.objects.filter(
-                        user=student, good_points__gt=0
-                    ).aggregate(Sum("good_points"))["good_points__sum"]
-                    or 0
-                )
-                bad_points = (
-                    UserProfile.objects.filter(
-                        user=student, bad_points__gt=0
-                    ).aggregate(Sum("bad_points"))["bad_points__sum"]
-                    or 0
-                )
+                good_points = (UserProfile.objects.filter(user=student))[0].good_points
+                bad_points = (UserProfile.objects.filter(user=student))[0].bad_points
 
                 user_profile = UserProfile.objects.get(user=request.user)
                 locker_rewards = user_profile.rewards.all()
@@ -124,6 +122,8 @@ def dashboard(request):
 
 ###-------------------------------CLASSROOM HANDLING-------------------------------###
 
+""" Authenticates user and displays respective base class interfaces """
+
 
 @login_required
 def base_class(request):
@@ -142,6 +142,9 @@ def base_class(request):
             )
 
 
+""" Checks if form is valid and creates class instance """
+
+
 @login_required
 def create_class(request):
     if request.method == "POST":
@@ -155,12 +158,18 @@ def create_class(request):
     return render(request, "classes/create_class.html", {"form": form})
 
 
+""" Searches for class and deletes class object """
+
+
 @login_required
 def delete_class(request, class_id):
     school_class = get_object_or_404(SchoolClass, pk=class_id)
     school_class.delete()
     messages.success(request, "Class deleted successfully!")
     return redirect("manage_classes")
+
+
+""" Searches for student and class and deletes student in that class """
 
 
 @login_required
@@ -170,6 +179,10 @@ def remove_student(request, code, student_id):
     school_class.remove_student(student)
     messages.success(request, "Student deleted successfully!")
     return redirect("manage_classes")
+
+
+""" Allows user to join class as long as 
+    class exists and user isn't already in the class """
 
 
 @login_required
@@ -205,6 +218,9 @@ def join_class(request):
         return render(request, "classes/join_class.html", {"form": form})
 
 
+""" Checks if teacher is in the class and allows teacher to leave """
+
+
 @login_required
 def leave_class(request, code):
     school_class = SchoolClass.objects.get(code=code)
@@ -212,11 +228,12 @@ def leave_class(request, code):
 
     if user == school_class.teacher:
         school_class.remove_teacher()
-    elif user in school_class.students.all():
-        school_class.remove_student(user)
     school_class.save()
 
     return redirect("base_class")
+
+
+""" Searches and displays all users and classes in admin portal """
 
 
 @login_required
@@ -230,35 +247,14 @@ def manage_classes(request):
     )
 
 
-@login_required
-def admin_move_user(request, user_id, class_id, action):
-    user = User.objects.get(id=user_id)
-    school_class = SchoolClass.objects.get(id=class_id)
-
-    if action == "add":
-        user_class = request.POST.get("user_class")
-        if user_class == "teacher":
-            school_class.add_teacher(user)
-        elif user_class == "student":
-            school_class.add_student(user)
-        school_class.save()
-
-    elif action == "remove":
-        user_class = request.POST.get("user_class")
-        if user_class == "teacher":
-            school_class.remove_teacher()
-        elif user_class == "student":
-            school_class.remove_student(user)
-        school_class.save()
-
-    return redirect("manage_classes")
+""" Sorts students by total points(good-bad points) in descending order """
 
 
 def class_leaderboard(request, class_id):
     school_class = SchoolClass.objects.get(id=class_id)
     students = school_class.students.all()
 
-    # Calculate the total points (good - bad) for each student and order by it
+    # Calculate the total points for each student and order by it
     students = sorted(
         students,
         key=lambda student: (
@@ -285,6 +281,9 @@ def class_leaderboard(request, class_id):
 
 
 ###-------------------------------REWARDS/POINTS-------------------------------###
+
+""" Gives/Removes specified points, if none specified take as 0,
+    Ensures good/bad points are never less than 0 """
 
 
 @login_required
@@ -314,23 +313,18 @@ def give_points(request, student_username):
     return redirect("base_class")
 
 
+""" Searches and retrieves student's good points,
+    bad points, rewards in locker. Also displays
+    all rewards in rewards store database """
+
+
 @login_required
 def rewards_view(request):
     student_username = request.user.username
     student = User.objects.get(username=student_username)
 
-    good_points = (
-        UserProfile.objects.filter(user=student, good_points__gt=0).aggregate(
-            Sum("good_points")
-        )["good_points__sum"]
-        or 0
-    )
-    bad_points = (
-        UserProfile.objects.filter(user=student, bad_points__gt=0).aggregate(
-            Sum("bad_points")
-        )["bad_points__sum"]
-        or 0
-    )
+    good_points = (UserProfile.objects.filter(user=student))[0].good_points
+    bad_points = (UserProfile.objects.filter(user=student))[0].bad_points
 
     rewards = Reward.objects.all()
     user_profile = UserProfile.objects.get(user=request.user)
@@ -351,6 +345,10 @@ def rewards_view(request):
             "reward_quantity_list": reward_quantity_list,
         },
     )
+
+
+""" Checks if user has enough points to purchase reward,
+    increments quantity of reward if already in locker """
 
 
 @login_required
@@ -381,17 +379,20 @@ def purchase_reward(request, reward_id):
 
 ###-------------------------------SELF REVISION VIEWS-------------------------------###
 
+""" Searches and retrieves every subject and
+    the number of flashcards for each subject """
+
 
 @login_required
 def self_rev(request):
     flashcards = Flashcard.objects.filter(owner=request.user)
 
+    # Creates an array of dictionaries of each subject and their number of occurences
     flashcard_data = (
         flashcards.values("subject")
         .annotate(count=Count("subject"))
         .order_by("subject")
     )
-    print(flashcard_data)
 
     flashcard_subjects = [data["subject"] for data in flashcard_data]
     flashcard_counts = [data["count"] for data in flashcard_data]
@@ -408,6 +409,9 @@ def self_rev(request):
     )
 
 
+""" Checks if form is valid and creates flashcard object """
+
+
 @login_required
 def create_flashcard(request):
     if request.method == "POST":
@@ -421,6 +425,11 @@ def create_flashcard(request):
         form = FlashcardForm()
         print("creating form")
     return render(request, "flashcards/create_flashcard.html", {"form": form})
+
+
+""" Retrieves all flashcards of user,
+    Deletes all selected flashcards,
+    Tests all selected flashcards """
 
 
 @login_required
@@ -443,6 +452,11 @@ def revise_flashcard(request):
     return render(
         request, "flashcards/revise_flashcard.html", {"flashcards": flashcards}
     )
+
+
+""" Displays selected flashcards,
+    checks if submitted answers are correct,
+    displays total score """
 
 
 @login_required
@@ -483,6 +497,7 @@ def test_flashcard(request, flashcard_ids):
 
 
 class StudentHomework:
+    """Filters all homework objects and categorises them"""
 
     def manage_homework(self, request):
         missingHomeworks = []
@@ -510,12 +525,17 @@ class StudentHomework:
                 "completedHomeworks": completedHomeworks,
             },
         )
-    
+
+    """ Deletes file from database """
+
     def remove_file(self, request, file_id, homework_id):
         file = get_object_or_404(HomeworkFile, id=file_id)
         file.delete()
         return redirect("edit_homework", homework_id=homework_id)
-    
+
+    """ Displays Homework assignment and creates submission object,
+        if completed checkbox ticked """
+
     def view_homework(self, request, homework_id):
         homework = get_object_or_404(Homework, id=homework_id)
         teacher_files = homework.files.all()
@@ -554,14 +574,18 @@ class StudentHomework:
             },
         )
 
+
 class TeacherHomework(StudentHomework):
+    """Searches all homework objects created by the teacher"""
 
     def manage_homework(self, request):
         homeworks = Homework.objects.filter(teacher=request.user)
         return render(
             request, "homework/manage_homework_teacher.html", {"homeworks": homeworks}
         )
-    
+
+    """ Creates homework object if form is valid """
+
     def create_homework(self, request):
         if request.method == "POST":
             form = HomeworkForm(request.POST, request.FILES)
@@ -586,6 +610,8 @@ class TeacherHomework(StudentHomework):
             "homework/create_homework.html",
             {"form": form, "classes": SchoolClass.objects.all()},
         )
+
+    """ Updates homework assignment details if form is valid """
 
     def edit_homework(self, request, homework_id):
         homework = get_object_or_404(Homework, id=homework_id)
@@ -616,6 +642,8 @@ class TeacherHomework(StudentHomework):
             request, "homework/edit_homework.html", {"form": form, "homework": homework}
         )
 
+    """ Deletes homework assignment """
+
     def delete_homework(self, request, homework_id):
         homework = get_object_or_404(Homework, id=homework_id)
 
@@ -623,6 +651,8 @@ class TeacherHomework(StudentHomework):
             homework.delete()
 
         return redirect("manage_homework")
+
+    """ Searches all submissions for homework assignment """
 
     def view_submissions(self, request, homework_id):
         homework = get_object_or_404(Homework, id=homework_id)
@@ -637,6 +667,10 @@ class TeacherHomework(StudentHomework):
             },
         )
 
+
+""" Authenticates user and displays respective interface """
+
+
 @login_required
 def user_manage_homework(request):
     profile = request.user.userprofile
@@ -646,14 +680,23 @@ def user_manage_homework(request):
         return StudentHomework().manage_homework(request)
 
 
+""" Create homework function called """
+
+
 @login_required
 def teacher_create_homework(request):
     return TeacherHomework().create_homework(request)
 
 
+""" Edit homework function called """
+
+
 @login_required
 def teacher_edit_homework(request, homework_id):
     return TeacherHomework().edit_homework(request, homework_id)
+
+
+""" Authenticates user and displays respective interface """
 
 
 @login_required
@@ -665,14 +708,23 @@ def remove_file_function(request, file_id, homework_id):
         return StudentHomework().remove_file(request, file_id, homework_id)
 
 
+""" Delete homework function called """
+
+
 @login_required
 def teacher_delete_homework(request, homework_id):
     return TeacherHomework().delete_homework(request, homework_id)
 
 
+""" View homework function called """
+
+
 @login_required
 def student_view_homework(request, homework_id):
     return StudentHomework().view_homework(request, homework_id)
+
+
+""" View submission function called """
 
 
 @login_required
@@ -681,6 +733,9 @@ def teacher_view_submissions(request, homework_id):
 
 
 ###-------------------------------SETTINGS/PROFILE-------------------------------###
+""" Updates profile picture if form valid """
+
+
 @login_required
 def update_profile(request):
     if request.method == "POST":
@@ -717,21 +772,32 @@ def update_profile(request):
 
 
 ###-------------------------------MESSAGING SYSTEM-------------------------------###
+""" Searches inappropriate words through message content,
+    flags if inappropriate words found  """
+
+
 def filter_inappropriate_content(message_content):
     inappropriate_patterns = [
         r"shit",
         r"fuck",
     ]
 
+    # Creates regex objects
     regex_patterns = [
         re.compile(pattern, re.IGNORECASE) for pattern in inappropriate_patterns
     ]
 
+    # Searches through the message_content
     for regex_pattern in regex_patterns:
         if regex_pattern.search(message_content):
             return True
 
     return False
+
+
+""" Retrieves all messages sent and recieved between user and
+    selected contact, determines if message was sent within 3 hours
+    of current time """
 
 
 @login_required
@@ -765,7 +831,6 @@ def send_message(request, recipient_id):
     for message in allmessages:
         time_difference = timezone.now() - message.timestamp
         message.editable = time_difference.total_seconds() <= 3 * 60 * 60
-        print(message.editable)
 
     if not request.user.userprofile.is_teacher:
         return render(
@@ -781,6 +846,9 @@ def send_message(request, recipient_id):
         )
 
 
+""" Updates message content and timestamp if form is valid and no inappropriate content """
+
+
 @login_required
 def edit_message(request, message_id):
     message = get_object_or_404(Message, pk=message_id, sender=request.user)
@@ -788,7 +856,8 @@ def edit_message(request, message_id):
     if request.method == "POST":
         form = MessageForm(request.POST, instance=message)
         if form.is_valid():
-            # Update the timestamp to the current time
+
+            # Update the timestamp to the current time and filters content
             message = form.save(commit=False)
             message.timestamp = timezone.now()
 
@@ -817,6 +886,9 @@ def edit_message(request, message_id):
         )
 
 
+""" Deletes message object """
+
+
 @login_required
 def delete_message(request, message_id):
     message = get_object_or_404(Message, pk=message_id, sender=request.user)
@@ -824,6 +896,9 @@ def delete_message(request, message_id):
     message.delete()
     messages.success(request, "Message deleted successfully.")
     return redirect("send_message", recipient_id=recipient_id)
+
+
+""" Deletes all messages between user and selected contact """
 
 
 @login_required
@@ -839,6 +914,10 @@ def clear_chat(request, recipient_id):
 
     messages.success(request, "Chat cleared successfully.")
     return redirect("inbox")
+
+
+""" Authenticates user and retrieves all users that
+    are in the same class as the user """
 
 
 @login_required
@@ -862,32 +941,18 @@ def inbox(request):
                 classes_enrolled__in=request.user.classes_enrolled.all(),
             )
         ).exclude(id=request.user.id)
-    conversation_id = request.GET.get("recipient_id")
-    conversation = None
-
-    if conversation_id:
-        conversation = User.objects.get(id=conversation_id)
-
-    messages = []
-    if conversation:
-        messages = Message.objects.filter(
-            (
-                models.Q(sender=request.user, recipient=conversation)
-                | models.Q(sender=conversation, recipient=request.user)
-            )
-        ).order_by("timestamp")
 
     if not request.user.userprofile.is_teacher:
         return render(
             request,
             "messaging/inbox.html",
-            {"recipients": recipients, "messages": messages},
+            {"recipients": recipients},
         )
     else:
         return render(
             request,
             "messaging/teacher_inbox.html",
-            {"recipients": recipients, "messages": messages},
+            {"recipients": recipients},
         )
 
 
@@ -939,6 +1004,9 @@ class Scraper:
         "Science": ["physics", "energy"],
     }
 
+    """ Scraps all rows of the table of conferences from website,
+        seperates each conference into date,title,location,subject """
+
     def scrapedata(self, tag):
         url = f"https://allconferencealert.net/cities/london.php?page={tag}"
         session = HTMLSession()
@@ -972,6 +1040,8 @@ class Scraper:
             print("Failed to fetch data.")
             return None
 
+    """ Formats date into Y-M-D """
+
     def format_date(self, date_str):
         day, month = date_str.split()
         day = day.rstrip("stndrdth")
@@ -991,7 +1061,11 @@ class Scraper:
             "Dec": "12",
         }
         formatted_date_str = f"{year}-{month_map[month]}-{day}"
+        print(formatted_date_str)
         return formatted_date_str
+
+    """ Categorises each conference into the set subjects by
+        searching conference title for keywords from dictionary """
 
     def get_subject(self, title):
         for subject, keywords in self.SUBJECT_MAPPING.items():
@@ -999,6 +1073,11 @@ class Scraper:
                 if keyword.lower() in title.lower():
                     return subject
         return "Other"
+
+
+""" Creates new academic events objects,
+    Retrieves all user's events,
+    Displays events of selected subject """
 
 
 @login_required
@@ -1046,6 +1125,10 @@ def calendar_view(request):
         )
 
 
+""" Creates event object if form valid,
+    and event not set in the past """
+
+
 @login_required
 def add_event(request):
     if request.method == "POST":
@@ -1070,6 +1153,9 @@ def add_event(request):
         return render(request, "calendar/add_event.html", {"form": form})
 
 
+""" Deletes event """
+
+
 @login_required
 def delete_event(request, event_id):
     event = get_object_or_404(Event, pk=event_id)
@@ -1082,6 +1168,8 @@ def delete_event(request, event_id):
 
 
 ###-------------------------------STUDYBOT-------------------------------###
+""" Requests for response from the api and display answer """
+
 
 @login_required
 def bot(request):
@@ -1115,6 +1203,10 @@ def bot(request):
 
 ###-------------------------------EXAMS/TEST-------------------------------###
 
+""" Retrieves all exams of the user,
+    Validates if the exam has been taken by student or not
+    and prevents ability to retake exams  """
+
 
 @login_required
 def base_exam(request):
@@ -1124,6 +1216,7 @@ def base_exam(request):
         if profile.is_teacher:
             exams = Exam.objects.filter(teacher=request.user)
             return render(request, "exam/base_exam_teacher.html", {"exams": exams})
+        
         else:
             classes = request.user.classes_enrolled.all()
             exams_with_submissions = []
@@ -1155,6 +1248,9 @@ def base_exam(request):
             )
 
 
+""" Creates exam object if form valid """
+
+
 @login_required
 def create_exam(request):
     if request.method == "POST":
@@ -1176,6 +1272,9 @@ def create_exam(request):
         exam_form = ExamForm()
 
     return render(request, "exam/create_exam.html", {"exam_form": exam_form})
+
+
+""" Creates question objects if forms valid """
 
 
 @login_required
@@ -1211,6 +1310,10 @@ def create_questions(request, exam_id):
     return render(
         request, "exam/create_questions.html", {"question_forms": question_forms}
     )
+
+
+""" If form valid, checks all student's answers 
+    with actual answer and calculates score """
 
 
 @login_required
@@ -1257,12 +1360,19 @@ def take_exam(request, exam_id):
     )
 
 
+""" Checks how any of the students' answers
+    are correct and totals the score """
+
+
 def calculate_score(submission):
     total_score = 0
     for student_answer in submission.studentanswer_set.all():
         if student_answer.is_correct:
             total_score += student_answer.question.marks
     return total_score
+
+
+""" Retrieves all submissions for the exam """
 
 
 @login_required
@@ -1274,6 +1384,10 @@ def view_exam_submissions(request, exam_id):
         "exam/view_exam_submissions.html",
         {"exam": exam, "submissions": submissions},
     )
+
+
+""" Retrieves all exams taken by the student,
+    calculates the percentage of each exam """
 
 
 @login_required
@@ -1299,3 +1413,5 @@ def exam_results(request, student_username):
     }
 
     return render(request, "exam/exam_results.html", context)
+
+#C:\Users\ashwi\Documents\studyswift_app\templates

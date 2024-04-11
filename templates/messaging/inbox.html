@@ -1,5 +1,4 @@
 {% extends 'application/dashboard.html' %}
-
 {% block styles %}
 <style>
     .inbox-container {
@@ -8,23 +7,19 @@
         max-width: 800px;
         margin: 0 auto;
     }
-
     .conversation-list {
         width: 30%;
         background-color: #2385a8;
         padding: 20px;
         border-radius: 8px;
     }
-
     .conversation-list ul {
         list-style-type: none;
         padding: 0;
     }
-
     .conversation-list li {
         margin-bottom: 10px;
     }
-
     .conversation-list a {
         text-decoration: none;
         color: #ffffff;
@@ -33,11 +28,9 @@
         border-radius: 5px;
         transition: background-color 0.3s;
     }
-
     .conversation-list a:hover {
         background-color: #07337a;
     }
-
     .chat-container {
         width: 65%;
         background-color: #04276e;
@@ -45,12 +38,9 @@
         border-radius: 8px;
         text-align: center;
     }
-
     .chat-container p {
         margin-bottom: 10px;
     }
-
-    /* Media query for responsiveness */
     @media (max-width: 768px) {
         .inbox-container {
             flex-direction: column;
@@ -61,11 +51,9 @@
             margin-bottom: 20px;
         }
     }
-
     .icon {
         font-size: 50px;
     }
-
     .inbox {
         background-color: #c3c2c8;
       color: white;
@@ -78,7 +66,6 @@
     }
 </style>
 {% endblock %}
-
 {% block content %}
   <h2>Inbox</h2>
   <div class="inbox-container">
@@ -98,9 +85,7 @@
         <i class='bx bxs-chat icon'></i>
     </div>
   </div>
-
   <div class="inbox">
     <a href="{% url 'base_class' %}">Back to Classes</a>
 </div>
-
 {% endblock %}
