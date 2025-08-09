@@ -14,11 +14,6 @@ db.sqlite3
 # Static folder at project root
 /static/
 
-# Ignore HTML templates from language statistics
-templates/* linguist-documentation=true
-
-# Optional: Ignore any standalone HTML files anywhere in the repo
-*.html linguist-documentation=true
 # macOS
 ._*
 .DS_Store
