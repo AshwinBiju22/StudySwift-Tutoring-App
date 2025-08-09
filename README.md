@@ -10,6 +10,16 @@ From AI-assisted studying to class management, homework tracking, and secure mes
 
 ---
 
+## Video Demonstration
+
+https://drive.google.com/file/d/1jsarHEZ3pINsFZKv71zQTkz04vxA1HNF/view?usp=sharing
+
+## Documentation
+
+https://drive.google.com/file/d/1sepUydkRf1-PQcLELQh-2n_CDvtfTc7a/view?usp=sharing
+
+---
+
 ## Key Features
 
 ### Login & Security
@@ -123,12 +133,3 @@ From AI-assisted studying to class management, homework tracking, and secure mes
 - **Charts:** (Specify e.g. Chart.js / Plotly)
 - **Email Services:** Django Email Backend (SMTP)
 
----
-
-## Video Demonstration
-
-https://drive.google.com/file/d/1jsarHEZ3pINsFZKv71zQTkz04vxA1HNF/view?usp=sharing
-
-## Documentation
-
-https://drive.google.com/file/d/1sepUydkRf1-PQcLELQh-2n_CDvtfTc7a/view?usp=sharing
