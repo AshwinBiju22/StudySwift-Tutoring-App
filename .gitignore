@@ -13,7 +13,7 @@ db.sqlite3
 
 # Static folder at project root
 /static/
-templates/* linguist-documentation=true
+*.html linguist-documentation=true
 
 # macOS
 ._*
