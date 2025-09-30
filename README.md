@@ -129,7 +129,7 @@ https://drive.google.com/file/d/1sepUydkRf1-PQcLELQh-2n_CDvtfTc7a/view?usp=shari
 ## Tech Stack
 - **Backend:** Django (Python)
 - **Frontend:** HTML, CSS, JavaScript
-- **Database:** (Specify e.g. SQLite/PostgreSQL/MySQL)
-- **Charts:** (Specify e.g. Chart.js / Plotly)
+- **Database:** (Django Models)
+- **Charts:** (Chart.js)
 - **Email Services:** Django Email Backend (SMTP)
 
